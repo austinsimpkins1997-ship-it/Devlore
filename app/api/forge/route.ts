@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     }
 
     const wordCount = text.trim().split(/\s+/).filter((w: string) => w.length > 0).length;
-    let xpEarned = Math.min(500, wordCount * 3 + 50);
+    const xpEarned = Math.min(500, wordCount * 3 + 50);
     
     let cardName: string | undefined;
     if (xpEarned >= 150) {

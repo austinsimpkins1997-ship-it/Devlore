@@ -154,7 +154,7 @@ export default function ForgePanel({ userId }: ForgePanelProps) {
             textShadow: '0 2px 4px rgba(0,0,0,0.5)',
             marginBottom: '2rem'
           }}>
-            "{result.narrative}"
+            &ldquo;{result.narrative}&rdquo;
           </p>
           
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
