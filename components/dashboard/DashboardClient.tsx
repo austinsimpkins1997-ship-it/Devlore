@@ -49,7 +49,7 @@ interface DashboardUser {
   currentStreak: number;
   longestStreak: number;
   totalCommits: number;
-  firstCommitDate: Date | null;
+  firstCommitDate: string | null;
   originStory: string | null;
   chapters: Chapter[];
   loreCards: LoreCardData[];
@@ -144,7 +144,7 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
                 currentStreak={user.currentStreak}
                 longestStreak={user.longestStreak}
                 totalCommits={user.totalCommits}
-                firstCommitDate={user.firstCommitDate?.toISOString() ?? null}
+                firstCommitDate={user.firstCommitDate}
               />
 
               {/* Origin Story */}

@@ -48,7 +48,7 @@ export default async function DashboardPage() {
     currentStreak: user.currentStreak,
     longestStreak: user.longestStreak,
     totalCommits: user.totalCommits,
-    firstCommitDate: user.firstCommitDate,
+    firstCommitDate: user.firstCommitDate ? user.firstCommitDate.toISOString() : null,
     originStory: user.originStory,
     chapters: user.chapters.map((c) => ({
       id: c.id,

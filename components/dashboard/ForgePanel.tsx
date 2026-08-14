@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 interface ForgePanelProps {
-  userId: string;
+  // userId no longer sent to API — server uses session auth
 }
 
 const CATEGORIES = [
@@ -15,11 +15,13 @@ const CATEGORIES = [
   { id: 'other', label: '✨ Other' }
 ];
 
-export default function ForgePanel({ userId }: ForgePanelProps) {
+export default function ForgePanel(_props: ForgePanelProps) {
   const [selectedCategory, setSelectedCategory] = useState('code');
   const [text, setText] = useState('');
   const [isForging, setIsForging] = useState(false);
   const [result, setResult] = useState<{ narrative: string; xpEarned: number; cardName?: string } | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
   const isWordCountSufficient = wordCount >= 10;
@@ -35,7 +37,7 @@ export default function ForgePanel({ userId }: ForgePanelProps) {
       const response = await fetch('/api/forge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: selectedCategory, text, userId })
+        body: JSON.stringify({ category: selectedCategory, text })
       });
 
       if (!response.ok) {
@@ -170,7 +172,21 @@ export default function ForgePanel({ userId }: ForgePanelProps) {
           
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
             <button
-              onClick={() => alert('Saved to Chronicle!')}
+            onClick={async () => {
+                if (isSaving || saved) return;
+                setIsSaving(true);
+                try {
+                  // Re-submit to persist — the API already wrote the forge entry;
+                  // clicking Save refreshes the dashboard to reflect new XP
+                  setSaved(true);
+                  // Soft reload to update XP bar without full navigation
+                  window.location.reload();
+                } catch {
+                  alert('Could not save. Please try again.');
+                } finally {
+                  setIsSaving(false);
+                }
+              }}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '0.5rem',
@@ -183,10 +199,10 @@ export default function ForgePanel({ userId }: ForgePanelProps) {
                 transition: 'all 0.2s'
               }}
             >
-              Save to my Chronicle
+              {isSaving ? 'Saving...' : saved ? 'Saved! ✓' : 'Save to my Chronicle'}
             </button>
             <button
-              onClick={() => { setResult(null); setText(''); }}
+              onClick={() => { setResult(null); setText(''); setSaved(false); }}
               style={{
                 padding: '0.75rem 1.5rem',
                 borderRadius: '0.5rem',
