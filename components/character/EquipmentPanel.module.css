@@ -1,0 +1,308 @@
+.panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 1.5rem;
+  padding: 1.75rem;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 12px;
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-rune), transparent);
+}
+
+@media (max-width: 780px) {
+  .panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--color-rune);
+  font-size: 1.25rem;
+  margin: 0 0 1.25rem 0;
+}
+
+/* ── Left column: paper doll flanked by slots ── */
+
+.dollColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dollRow {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.slotStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dollFrame {
+  background: radial-gradient(circle at 50% 35%, rgba(124, 58, 237, 0.12), rgba(7, 7, 15, 0.9));
+  border: 1px solid var(--color-twilight);
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.slot {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: rgba(18, 18, 42, 0.8);
+  border: 1px solid var(--color-twilight);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+}
+
+.slot:hover {
+  border-color: var(--color-rune);
+}
+
+.slotFilled {
+  border-width: 2px;
+}
+
+.slotIcon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.slotLabel {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--color-shadow);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.slotPower {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--color-rune);
+}
+
+.heroName {
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 1.05rem;
+  text-align: center;
+  margin: 0;
+}
+
+.heroMeta {
+  color: var(--color-mist);
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0;
+}
+
+.editLink {
+  background: none;
+  border: 1px solid var(--color-twilight);
+  border-radius: 6px;
+  color: var(--color-mist);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.editLink:hover {
+  border-color: var(--color-rune);
+  color: var(--color-frost);
+}
+
+/* ── Right column: stats + inventory ── */
+
+.statsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
+}
+
+.statBox {
+  background: rgba(18, 18, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--color-shadow);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statValue {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--color-frost);
+}
+
+.totalBox {
+  border-color: rgba(201, 168, 76, 0.4);
+  background: linear-gradient(150deg, rgba(201, 168, 76, 0.1), rgba(13, 13, 26, 0.8));
+}
+
+.totalValue {
+  color: var(--color-rune);
+}
+
+.subTitle {
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 0.95rem;
+  margin: 0 0 0.6rem 0;
+}
+
+.bonusList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.bonusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(18, 18, 42, 0.5);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-rune-dim);
+}
+
+.bonusLabel {
+  color: var(--color-frost);
+  font-size: 0.85rem;
+}
+
+.bonusDetail {
+  display: block;
+  color: var(--color-shadow);
+  font-size: 0.7rem;
+}
+
+.bonusAmount {
+  font-family: var(--font-mono);
+  color: var(--color-success);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.inventory {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.75rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.invItem {
+  text-align: left;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(18, 18, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left-width: 3px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.invItem:hover {
+  border-color: var(--color-rune);
+}
+
+.invItemEquipped {
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.35);
+}
+
+.invName {
+  display: block;
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+
+.invMeta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.invRarity {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.invPower {
+  color: var(--color-rune);
+}
+
+.equipTag {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--color-success);
+}
+
+.empty {
+  color: var(--color-mist);
+  font-style: italic;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.stateMsg {
+  color: var(--color-mist);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0;
+}

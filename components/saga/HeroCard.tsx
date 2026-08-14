@@ -34,7 +34,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   xp,
   tier,
   currentStreak,
-  _longestStreak,
+  longestStreak,
   totalCommits,
   firstCommitDate,
 }) => {
@@ -104,6 +104,11 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           <div className={styles.statIcon}>🔥</div>
           <div className={styles.statValue}>{currentStreak}</div>
           <div className={styles.statLabel}>Day Streak</div>
+        </div>
+        <div className={styles.statBox}>
+          <div className={styles.statIcon}>⚡</div>
+          <div className={styles.statValue}>{longestStreak}</div>
+          <div className={styles.statLabel}>Best Streak</div>
         </div>
         <div className={styles.statBox}>
           <div className={styles.statIcon}>⚔️</div>

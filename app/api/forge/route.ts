@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { prisma } from '@/lib/prisma';
+import { generateText } from '@/lib/ai/client';
+import { awardXpWithLoot, type EquipmentDrop } from '@/lib/equipment';
 
 const CARD_NAMES: Record<string, string> = {
   code: 'Spellwright',
@@ -9,23 +10,46 @@ const CARD_NAMES: Record<string, string> = {
   learning: 'Arcane Student',
   body: 'Iron Temperer',
   creative: 'Bard of the Realm',
-  other: 'Keeper of Mysteries'
+  other: 'Keeper of Mysteries',
 };
 
 const VALID_CATEGORIES = new Set(['code', 'design', 'learning', 'body', 'creative', 'other']);
 const MAX_TEXT_LENGTH = 2000;
+const MAX_ENTRIES_PER_HOUR = 10;
 
-// Singleton — avoids re-instantiation on every request
-const genAI = process.env.GEMINI_API_KEY
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  : null;
+async function generateNarrative(category: string, sanitizedText: string, xpEarned: number): Promise<string> {
+  const fallback = `In the chronicles of your legend, this day shall be remembered. You undertook ${category} work of significance, and through it, your mastery grew by ${xpEarned} XP. The saga continues.`;
+
+  try {
+    const prompt = `You are the narrator of DEVLORE, a dark fantasy chronicle of developer legends. A hero has shared what they accomplished. Transform it into one paragraph (4-6 sentences) of immersive fantasy saga prose.
+
+The hero selected category: ${category}
+What they accomplished: ${sanitizedText}
+
+Write in the voice of an epic fantasy narrator. Use second person ('you'). Reference the category metaphorically (code = spellwork/incantations, design = visual alchemy, learning = arcane study, body = physical tempering, creative = bardic creation, other = a mysterious deed). Make it dramatic and specific to what they actually described. End with a statement about how it advances their legend.
+
+Return ONLY the narrative paragraph, no other text.`;
+
+    const { text } = await generateText({
+      prompt,
+      temperature: 0.85,
+      maxTokens: 512,
+    });
+    const narrative = text.trim();
+    return narrative.length > 0 ? narrative : fallback;
+  } catch (error) {
+    console.error('[api/forge] All AI providers failed, using fallback:', error);
+    return fallback;
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = session.user.id;
 
     const body = await req.json();
     const { category, text } = body;
@@ -47,43 +71,66 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Text cannot be empty' }, { status: 400 });
     }
 
-    // Soft rate limit: max 10 forge calls per hour per user (checked via recent chapters)
-    const recentForge = await prisma.chapter.count({
-      where: { userId: session.user.id!, createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) } },
+    // Rate limit: max 10 forge entries per hour per user
+    const recentEntries = await prisma.forgeEntry.count({
+      where: { userId, createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) } },
     });
-    if (recentForge >= 10) {
-      return NextResponse.json({ error: 'Rate limit: max 10 forge entries per hour' }, { status: 429 });
+    if (recentEntries >= MAX_ENTRIES_PER_HOUR) {
+      return NextResponse.json(
+        { error: `Rate limit: max ${MAX_ENTRIES_PER_HOUR} forge entries per hour` },
+        { status: 429 },
+      );
     }
 
-    const wordCount = sanitizedText.trim().split(/\s+/).length;
+    const wordCount = sanitizedText.split(/\s+/).filter((w) => w.length > 0).length;
     const xpEarned = Math.min(500, wordCount * 3 + 50);
+    const cardName = xpEarned >= 150 ? (CARD_NAMES[category] ?? CARD_NAMES.other) : undefined;
 
-    let cardName: string | undefined;
-    if (xpEarned >= 150) {
-      cardName = CARD_NAMES[category] || CARD_NAMES['other'];
-    }
+    const narrative = await generateNarrative(category, sanitizedText, xpEarned);
 
-    if (!genAI) {
-      const fallbackNarrative = `In the chronicles of your legend, this day shall be remembered. You undertook ${category} work of significance, and through it, your mastery grew by ${xpEarned} XP. The saga continues.`;
-      return NextResponse.json({ narrative: fallbackNarrative, xpEarned, cardName });
-    }
+    // Persist the entry and award XP + loot atomically
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { xp: true, level: true },
+    });
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    let drops: EquipmentDrop[] = [];
+    let newXp = user.xp;
+    let newLevel = user.level;
 
-    const prompt = `You are the narrator of DEVLORE, a dark fantasy chronicle of developer legends. A hero has shared what they accomplished. Transform it into one paragraph (4-6 sentences) of immersive fantasy saga prose.
+    await prisma.$transaction(async (tx) => {
+      await tx.forgeEntry.create({
+        data: { userId, category, text: sanitizedText, narrative, wordCount, xpEarned },
+      });
+      const award = await awardXpWithLoot(tx, userId, user.xp, user.level, xpEarned);
+      drops = award.drops;
+      newXp = award.newXp;
+      newLevel = award.newLevel;
+      if (cardName) {
+        await tx.loreCard.create({
+          data: {
+            userId,
+            cardType: 'ACHIEVEMENT',
+            rarity: xpEarned >= 300 ? 'RARE' : 'UNCOMMON',
+            name: cardName,
+            flavorText: narrative.length > 180 ? `${narrative.slice(0, 177)}...` : narrative,
+            milestone: `Forged a ${category} entry of ${wordCount} words`,
+            xpValue: xpEarned,
+          },
+        });
+      }
+    });
 
-The hero selected category: ${category}
-What they accomplished: ${sanitizedText}
-
-Write in the voice of an epic fantasy narrator. Use second person ('you'). Reference the category metaphorically (code = spellwork/incantations, design = visual alchemy, learning = arcane study, body = physical tempering, creative = bardic creation, other = a mysterious deed). Make it dramatic and specific to what they actually described. End with a statement about how it advances their legend.
-
-Return ONLY the narrative paragraph, no other text.`;
-
-    const result = await model.generateContent(prompt);
-    const narrative = result.response.text().trim();
-
-    return NextResponse.json({ narrative, xpEarned, cardName });
-
+    return NextResponse.json({
+      narrative,
+      xpEarned,
+      cardName,
+      newXp,
+      newLevel,
+      leveledUp: newLevel > user.level,
+      drops,
+      saved: true,
+    });
   } catch (error) {
     console.error('Forge API Error:', error);
     return NextResponse.json({ error: 'Failed to forge narrative' }, { status: 500 });

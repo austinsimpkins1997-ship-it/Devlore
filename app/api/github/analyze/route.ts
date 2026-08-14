@@ -3,9 +3,14 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { syncUserGitHubStats } from '@/lib/github/sync';
 import { generateOriginStory } from '@/lib/narrative/generator';
+import { buildFallbackOriginStory } from '@/lib/narrative/fallback';
 import { assignHeroClass } from '@/lib/narrative/hero-class';
 import { getLevel } from '@/lib/narrative/xp';
+import { rollEquipmentForLevel } from '@/lib/equipment';
 import { RATE_LIMITS, XP_RATES, MILESTONE_TRIGGERS } from '@/lib/constants';
+
+/** Analyses stuck in PENDING/RUNNING longer than this are considered dead. */
+const STALE_ANALYSIS_MS = 10 * 60 * 1000;
 
 /**
  * POST /api/github/analyze
@@ -21,7 +26,18 @@ export async function POST(_req: NextRequest) {
   const userId = session.user.id;
 
   try {
-    // Check for in-progress analysis
+    // Release stale locks first — a dev-server restart or crash mid-analysis
+    // must never block re-analysis forever.
+    await prisma.analysis.updateMany({
+      where: {
+        userId,
+        status: { in: ['PENDING', 'RUNNING'] },
+        startedAt: { lt: new Date(Date.now() - STALE_ANALYSIS_MS) },
+      },
+      data: { status: 'FAILED', completedAt: new Date(), error: 'Stale — marked failed by watchdog' },
+    });
+
+    // Check for a genuinely in-progress analysis
     const existingAnalysis = await prisma.analysis.findFirst({
       where: { userId, status: { in: ['PENDING', 'RUNNING'] } },
     });
@@ -118,13 +134,42 @@ export async function POST(_req: NextRequest) {
         data: { xp: initialXp, level: initialLevel },
       });
 
-      // Step 4: Generate origin story with AI
-      const originResult = await generateOriginStory(stats);
+      // Equipment drops for every level earned in the backfill
+      // (idempotent — @@unique([userId, levelAwarded]) + skipDuplicates)
+      if (initialLevel > 1) {
+        const drops = [];
+        for (let lvl = 2; lvl <= initialLevel; lvl++) {
+          drops.push(rollEquipmentForLevel(userId, lvl));
+        }
+        await prisma.equipment.createMany({
+          data: drops.map((d) => ({
+            userId,
+            slot: d.slot,
+            rarity: d.rarity,
+            name: d.name,
+            flavorText: d.flavorText,
+            power: d.power,
+            levelAwarded: d.levelAwarded,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      // Step 4: Generate origin story — AI first, deterministic fallback if
+      // the AI is unavailable so analysis always completes.
+      let originStory: string;
+      try {
+        const originResult = await generateOriginStory(stats);
+        originStory = originResult.originStory;
+      } catch (aiError) {
+        console.error('[analyze] AI origin story unavailable, using fallback:', aiError);
+        originStory = buildFallbackOriginStory(stats, hc.name, hc.title);
+      }
 
       await prisma.user.update({
         where: { id: userId },
         data: {
-          originStory: originResult.originStory,
+          originStory,
           heroClass: hc.name,
           heroTitle: hc.title,
           heroClassSlug: hc.slug,

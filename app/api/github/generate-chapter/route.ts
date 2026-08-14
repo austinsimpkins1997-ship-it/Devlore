@@ -3,16 +3,36 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { getWeeklyContributions } from '@/lib/github/contributions';
 import { generateWeeklyChapter } from '@/lib/narrative/generator';
+import { buildFallbackChapter } from '@/lib/narrative/fallback';
 import { getHeroClassBySlug } from '@/lib/narrative/hero-class';
-import { getLevel } from '@/lib/narrative/xp';
+import { awardXpWithLoot } from '@/lib/equipment';
 import type { HeroClassSlug, NarrativeInput } from '@/types';
 
 /**
  * POST /api/github/generate-chapter
  * Generates a saga chapter from the past 7 days of GitHub activity.
  * Requires heroClass to be set (analysis must have run first).
+ * Falls back to a stats-derived chapter when the AI is unavailable, and
+ * always returns JSON — never an unhandled 500.
  */
 export async function POST() {
+  try {
+    return await handleGenerateChapter();
+  } catch (error) {
+    console.error('[api/github/generate-chapter] Error:', error);
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? `Chapter generation failed: ${error.message}`
+            : 'Chapter generation failed. Check server logs.',
+      },
+      { status: 500 },
+    );
+  }
+}
+
+async function handleGenerateChapter() {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -117,9 +137,18 @@ export async function POST() {
     previousChapterSummary: lastChapter?.summary ?? null,
   };
 
-  const chapter = await generateWeeklyChapter(input);
+  // AI first; deterministic stats-based chapter if the AI is unavailable
+  let chapter;
+  let usedFallback = false;
+  try {
+    chapter = await generateWeeklyChapter(input);
+  } catch (aiError) {
+    console.error('[api/github/generate-chapter] AI unavailable, using fallback:', aiError);
+    chapter = buildFallbackChapter(input);
+    usedFallback = true;
+  }
 
-  // Save chapter + lore cards + update XP atomically
+  // Save chapter + lore cards + update XP/loot atomically
   await prisma.$transaction(async (tx) => {
     await tx.chapter.create({
       data: {
@@ -153,12 +182,7 @@ export async function POST() {
       });
     }
 
-    const newXp = user.xp + chapter.xpEarned;
-    const newLevel = getLevel(newXp);
-    await tx.user.update({
-      where: { id: userId },
-      data: { xp: newXp, level: newLevel },
-    });
+    await awardXpWithLoot(tx, userId, user.xp, user.level, chapter.xpEarned);
   });
 
   return NextResponse.json({
@@ -167,5 +191,6 @@ export async function POST() {
     title: chapter.title,
     xpEarned: chapter.xpEarned,
     newCardsCount: chapter.newCards.length,
+    usedFallback,
   });
 }

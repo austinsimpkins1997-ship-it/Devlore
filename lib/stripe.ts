@@ -44,10 +44,10 @@ export const PLANS = {
     name: 'Pro',
     price: 5,
     features: [
-      'Weekly AI Chronicles',
-      'Uncapped XP gain',
-      'Exclusive Pro Lore Cards',
-      'Customizable Hero Portrait',
+      'Automatic weekly AI chronicles',
+      'Unlimited chapter history',
+      'Weekly quest XP claims',
+      'Chronicle emails & manual re-analysis',
     ],
   },
   LEGEND: {
@@ -56,9 +56,9 @@ export const PLANS = {
     price: 15,
     features: [
       'Everything in Pro',
-      'PDF Export of Full Saga',
-      'Multi-class evolution options',
-      'Priority AI generation',
+      '1.5× XP on every quest claim',
+      'Unlimited lore card collection',
+      'Legend flair on the leaderboard',
     ],
   },
 };

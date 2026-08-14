@@ -1,31 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './PricingTable.module.css';
 import { Button } from '../ui/Button';
 
 export const PricingTable: React.FC = () => {
-  const [isAnnual, setIsAnnual] = useState(true);
-
   return (
     <section className={styles.pricingSection}>
       <div className={styles.header}>
         <h2 className={styles.title}>Choose Your Path</h2>
-        <p className={styles.subtitle}>Unlock the full potential of your developer saga.</p>
-        
-        <div className={styles.toggleWrapper}>
-          <span className={`${styles.toggleLabel} ${!isAnnual ? styles.active : ''}`}>Monthly</span>
-          <button 
-            className={styles.toggleBtn} 
-            onClick={() => setIsAnnual(!isAnnual)}
-            aria-pressed={isAnnual}
-          >
-            <span className={`${styles.toggleKnob} ${isAnnual ? styles.knobAnnual : ''}`} />
-          </button>
-          <span className={`${styles.toggleLabel} ${isAnnual ? styles.active : ''}`}>
-            Annually <span className={styles.discountBadge}>Save 20%</span>
-          </span>
-        </div>
+        <p className={styles.subtitle}>
+          Unlock the full potential of your developer saga. Paid tiers start with a 14-day free trial.
+        </p>
       </div>
 
       <div className={styles.grid}>
@@ -40,19 +26,20 @@ export const PricingTable: React.FC = () => {
             </div>
             <p className={styles.tierDesc}>Begin your journey and see what DevLore is about.</p>
           </div>
-          
+
           <ul className={styles.featureList}>
-            <li className={styles.included}>Basic Hero Card</li>
-            <li className={styles.included}>First 3 Saga Chapters</li>
-            <li className={styles.included}>Common & Uncommon Lore Cards</li>
-            <li className={styles.excluded}>Private Repositories</li>
-            <li className={styles.excluded}>Custom Themes</li>
+            <li className={styles.included}>Hero card & AI origin story</li>
+            <li className={styles.included}>Daily quests & milestone XP</li>
+            <li className={styles.included}>The Forge, Arena & leaderboard</li>
+            <li className={styles.included}>Weekly trophy eligibility</li>
+            <li className={styles.excluded}>Automatic weekly chronicles</li>
+            <li className={styles.excluded}>Weekly quest XP claims</li>
           </ul>
-          
-          <Button 
-            variant="ghost" 
+
+          <Button
+            variant="ghost"
             className={styles.cta}
-            onClick={() => window.location.href='/sign-in'}
+            onClick={() => (window.location.href = '/sign-in')}
           >
             Start Free
           </Button>
@@ -65,24 +52,24 @@ export const PricingTable: React.FC = () => {
             <h3 className={styles.tierName}>Hero</h3>
             <div className={styles.priceBlock}>
               <span className={styles.currency}>$</span>
-              <span className={styles.price}>{isAnnual ? '9' : '12'}</span>
+              <span className={styles.price}>5</span>
               <span className={styles.period}>/mo</span>
             </div>
-            <p className={styles.tierDesc}>Unlock your full history and advanced stats.</p>
+            <p className={styles.tierDesc}>Your saga writes itself — every single week.</p>
           </div>
-          
+
           <ul className={styles.featureList}>
             <li className={styles.included}>Everything in Wanderer</li>
-            <li className={styles.included}>Unlimited Saga Chapters</li>
-            <li className={styles.included}>Rare & Epic Lore Cards</li>
-            <li className={styles.included}>Private Repositories Support</li>
-            <li className={styles.excluded}>Custom Domains</li>
+            <li className={styles.included}>Automatic weekly AI chronicles</li>
+            <li className={styles.included}>Unlimited chapter history</li>
+            <li className={styles.included}>Weekly quest XP claims</li>
+            <li className={styles.included}>Chronicle emails & manual re-analysis</li>
           </ul>
-          
-          <Button 
-            variant="primary" 
+
+          <Button
+            variant="primary"
             className={styles.cta}
-            onClick={() => window.location.href='/sign-in?plan=pro'}
+            onClick={() => (window.location.href = '/sign-in?plan=pro')}
           >
             Begin Your Legend
           </Button>
@@ -94,24 +81,24 @@ export const PricingTable: React.FC = () => {
             <h3 className={styles.tierName}>Legend</h3>
             <div className={styles.priceBlock}>
               <span className={styles.currency}>$</span>
-              <span className={styles.price}>{isAnnual ? '19' : '25'}</span>
+              <span className={styles.price}>15</span>
               <span className={styles.period}>/mo</span>
             </div>
-            <p className={styles.tierDesc}>For the elite coders who want ultimate customization.</p>
+            <p className={styles.tierDesc}>For heroes who want every edge in the realm.</p>
           </div>
-          
+
           <ul className={styles.featureList}>
             <li className={styles.included}>Everything in Hero</li>
-            <li className={styles.included}>Legendary Animated Cards</li>
-            <li className={styles.included}>Custom Domains</li>
-            <li className={styles.included}>Custom Hero Themes</li>
-            <li className={styles.included}>API Access</li>
+            <li className={styles.included}>1.5× XP on every quest claim</li>
+            <li className={styles.included}>Unlimited lore card collection</li>
+            <li className={styles.included}>Legend flair on the leaderboard</li>
+            <li className={styles.included}>First access to new Legend features</li>
           </ul>
-          
-          <Button 
-            variant="secondary" 
+
+          <Button
+            variant="secondary"
             className={styles.cta}
-            onClick={() => window.location.href='/sign-in?plan=legend'}
+            onClick={() => (window.location.href = '/sign-in?plan=legend')}
           >
             Become Legendary
           </Button>

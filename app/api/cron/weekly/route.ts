@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { inngest } from '@/lib/inngest/client';
+import { awardWeeklyTrophies, type WeeklyTrophyReport } from '@/lib/trophies';
 
 export const maxDuration = 60;
 
 /**
- * Weekly chapter generation cron — runs every Monday at 09:00 UTC
+ * Weekly cron — runs every Monday at 09:00 UTC
  * Configured in vercel.json: { "crons": [{ "path": "/api/cron/weekly", "schedule": "0 9 * * 1" }] }
+ *
+ * 1. Dispatches chapter generation for PRO/LEGEND users
+ * 2. Awards last week's trophies (best submission, most forge XP, longest streak)
  *
  * Security: Vercel sets Authorization: Bearer <CRON_SECRET> automatically
  */
@@ -85,8 +89,16 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Award last week's trophies — idempotent, so a repeated cron run is safe.
+    let trophies: WeeklyTrophyReport | undefined;
+    try {
+      trophies = await awardWeeklyTrophies(now);
+    } catch (err) {
+      errors.push(`trophies: ${String(err)}`);
+    }
+
     console.log(
-      `[cron/weekly] Dispatched: ${dispatched}, Skipped: ${skipped}, Errors: ${errors.length}`,
+      `[cron/weekly] Dispatched: ${dispatched}, Skipped: ${skipped}, Errors: ${errors.length}, Trophies: ${trophies?.awarded.length ?? 0}`,
     );
 
     return NextResponse.json({
@@ -95,6 +107,7 @@ export async function GET(req: NextRequest) {
       weekEnd: weekEndISO,
       dispatched,
       skipped,
+      trophies,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {

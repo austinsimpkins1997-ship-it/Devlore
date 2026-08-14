@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
+import { getEarnedBadges } from '@/lib/badges';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -22,6 +23,12 @@ export default async function DashboardPage() {
       },
       loreCards: {
         orderBy: { unlockedAt: 'desc' },
+      },
+      trophies: {
+        orderBy: { awardedAt: 'desc' },
+      },
+      equipment: {
+        orderBy: [{ equipped: 'desc' }, { power: 'desc' }],
       },
     },
   });
@@ -71,6 +78,40 @@ export default async function DashboardPage() {
       xpValue: lc.xpValue,
       unlockedAt: lc.unlockedAt.toISOString(),
     })),
+    trophies: user.trophies.map((t) => ({
+      id: t.id,
+      kind: t.kind,
+      weekKey: t.weekKey,
+      title: t.title,
+      description: t.description,
+      awardedAt: t.awardedAt.toISOString(),
+    })),
+    equipment: user.equipment.map((e) => ({
+      id: e.id,
+      slot: e.slot,
+      rarity: e.rarity,
+      name: e.name,
+      flavorText: e.flavorText,
+      power: e.power,
+      levelAwarded: e.levelAwarded,
+    })),
+    badges: getEarnedBadges({
+      totalCommits: user.totalCommits,
+      longestStreak: user.longestStreak,
+      languageCount: user.languageCount,
+      openSourceContribCount: user.openSourceContribCount,
+      hasInfraRepos: user.hasInfraRepos,
+      chaptersCount: user.chapters.length,
+      trophyCount: user.trophies.length,
+    }),
+    appearance: {
+      charBody: user.charBody,
+      charSkin: user.charSkin,
+      charHair: user.charHair,
+      charCloak: user.charCloak,
+      charAura: user.charAura,
+    },
+    charCreated: user.charCreated,
   };
 
   return (

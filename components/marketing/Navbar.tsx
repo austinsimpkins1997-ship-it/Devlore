@@ -42,6 +42,30 @@ const FEATURES_ITEMS = [
     desc: 'Real progression tied to your real GitHub activity',
     href: '/#xp-levels',
   },
+  {
+    icon: '🎯',
+    title: 'Quests & Milestones',
+    desc: 'Daily and weekly quests with claimable XP',
+    href: '/dashboard',
+  },
+  {
+    icon: '🏆',
+    title: 'Weekly Trophies',
+    desc: 'Best Forge submission wins the Champion’s Quill',
+    href: '/leaderboard',
+  },
+  {
+    icon: '🗡️',
+    title: 'Gear & Loot',
+    desc: 'Every level drops equipment that powers your Arena score',
+    href: '/dashboard',
+  },
+  {
+    icon: '🤝',
+    title: 'Fellowship',
+    desc: 'Add friends, message them, and browse every hero',
+    href: '/heroes',
+  },
 ];
 
 const WHY_ITEMS = [
@@ -213,6 +237,12 @@ export const Navbar: React.FC = () => {
           <Link href="/arena" className={`${styles.navLink} ${isActive('/arena') ? styles.navLinkActive : ''}`}>
             ⚔️ Arena
           </Link>
+          <Link href="/leaderboard" className={`${styles.navLink} ${isActive('/leaderboard') ? styles.navLinkActive : ''}`}>
+            🏆 Leaderboard
+          </Link>
+          <Link href="/heroes" className={`${styles.navLink} ${isActive('/heroes') ? styles.navLinkActive : ''}`}>
+            🧭 Heroes
+          </Link>
         </div>
 
         {/* CTA */}
@@ -267,6 +297,15 @@ export const Navbar: React.FC = () => {
           <div className={styles.mobileSection}>
             <Link href="/pricing" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
               💎 Pricing
+            </Link>
+            <Link href="/arena" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              ⚔️ Arena
+            </Link>
+            <Link href="/leaderboard" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              🏆 Leaderboard
+            </Link>
+            <Link href="/heroes" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              🧭 Heroes
             </Link>
           </div>
           <Link href="/sign-in" className={styles.mobileCta} onClick={() => setMobileOpen(false)}>

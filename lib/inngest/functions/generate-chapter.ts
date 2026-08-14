@@ -5,7 +5,7 @@ import { generateWeeklyChapter } from '@/lib/narrative/generator';
 import { prisma } from '@/lib/prisma';
 import { getHeroClassBySlug } from '@/lib/narrative/hero-class';
 import type { HeroClassSlug } from '@/types';
-import { getLevel } from '@/lib/narrative/xp';
+import { awardXpWithLoot } from '@/lib/equipment';
 
 export const generateChapter = inngest.createFunction(
   { id: 'generate-chapter', retries: 3 },
@@ -129,17 +129,8 @@ export const generateChapter = inngest.createFunction(
           });
         }
 
-        // Update user XP and level
-        const newXp = user.xp + chapter.xpEarned;
-        const newLevel = getLevel(newXp);
-
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            xp: newXp,
-            level: newLevel,
-          },
-        });
+        // Update user XP and level — drops equipment for levels gained
+        await awardXpWithLoot(tx, userId, user.xp, user.level, chapter.xpEarned);
       });
     });
 

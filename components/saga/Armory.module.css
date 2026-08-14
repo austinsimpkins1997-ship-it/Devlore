@@ -1,0 +1,119 @@
+.panel {
+  padding: 1.75rem;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 12px;
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rarity-epic), transparent);
+}
+
+.headerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--rarity-epic);
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.power {
+  font-family: var(--font-mono);
+  color: var(--color-rune);
+  font-size: 0.9rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.item {
+  padding: 1.1rem;
+  border-radius: 10px;
+  background: rgba(18, 18, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left-width: 4px;
+}
+
+.rare {
+  border-left-color: var(--rarity-rare);
+}
+.epic {
+  border-left-color: var(--rarity-epic);
+}
+.unique {
+  border-left-color: #f97316;
+}
+.legendary {
+  border-left-color: var(--rarity-legendary);
+  background: linear-gradient(150deg, rgba(245, 158, 11, 0.1), rgba(13, 13, 26, 0.9));
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.12);
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.slotIcon {
+  font-size: 1.2rem;
+}
+
+.itemName {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 0.95rem;
+}
+
+.itemFlavor {
+  margin: 0 0 0.6rem 0;
+  color: var(--color-mist);
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.itemMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.rarityTag {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.powerTag {
+  color: var(--color-rune);
+}
+
+.empty {
+  color: var(--color-mist);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0;
+}

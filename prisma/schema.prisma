@@ -95,6 +95,14 @@ model User {
   // GitHub App installation (for private repos)
   ghInstallationId Int?
 
+  // Character appearance (chosen at sign-up in the character creator)
+  charBody      String  @default("neutral")
+  charSkin      String  @default("umber")
+  charHair      String  @default("raven")
+  charCloak     String  @default("wanderer")
+  charAura      String  @default("none")
+  charCreated   Boolean @default(false)
+
   // Settings
   isPublic         Boolean @default(true)
   emailChronicle   Boolean @default(true)
@@ -105,11 +113,21 @@ model User {
   lastAnalyzedAt DateTime?
 
   // Relations
-  accounts  Account[]
-  sessions  Session[]
-  chapters  Chapter[]
-  loreCards LoreCard[]
-  analyses  Analysis[]
+  accounts      Account[]
+  sessions      Session[]
+  chapters      Chapter[]
+  loreCards     LoreCard[]
+  analyses      Analysis[]
+  forgeEntries  ForgeEntry[]
+  questProgress QuestProgress[]
+  trophies      Trophy[]
+  kudosGiven    Kudos[]         @relation("KudosGiven")
+  kudosReceived Kudos[]         @relation("KudosReceived")
+  equipment     Equipment[]
+  friendRequestsSent     Friendship[] @relation("FriendRequestsSent")
+  friendRequestsReceived Friendship[] @relation("FriendRequestsReceived")
+  messagesSent     Message[] @relation("MessagesSent")
+  messagesReceived Message[] @relation("MessagesReceived")
 
   @@index([username])
   @@index([tier])
@@ -176,6 +194,136 @@ model Analysis {
   @@index([userId, status])
 }
 
+model ForgeEntry {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category  String // "code" | "design" | "learning" | "body" | "creative" | "other"
+  text      String @db.Text
+  narrative String @db.Text
+  wordCount Int    @default(0)
+  xpEarned  Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  trophies Trophy[]
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model QuestProgress {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  questSlug String
+  // Period the progress belongs to: "2026-08-14" (daily), "2026-W33" (weekly),
+  // or "all-time" (milestone quests)
+  periodKey String
+
+  progress    Int       @default(0)
+  target      Int       @default(1)
+  completedAt DateTime?
+  claimedAt   DateTime?
+  xpAwarded   Int       @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, questSlug, periodKey])
+  @@index([userId, periodKey])
+}
+
+model Trophy {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind        TrophyKind
+  weekKey     String // ISO week, e.g. "2026-W33"
+  title       String
+  description String
+
+  forgeEntryId String?
+  forgeEntry   ForgeEntry? @relation(fields: [forgeEntryId], references: [id], onDelete: SetNull)
+
+  awardedAt DateTime @default(now())
+
+  // One trophy of each kind per week, platform-wide — makes weekly awards
+  // idempotent even if the cron fires twice.
+  @@unique([kind, weekKey])
+  @@index([userId])
+  @@index([awardedAt])
+}
+
+model Kudos {
+  id         String @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  from       User   @relation("KudosGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  to         User   @relation("KudosReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+  @@index([toUserId])
+}
+
+model Equipment {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  slot       EquipmentSlot
+  rarity     EquipmentRarity
+  name       String
+  flavorText String
+  power      Int             @default(0)
+
+  // The level whose attainment dropped this item — one drop per level,
+  // which also makes re-runs idempotent.
+  levelAwarded Int
+  awardedAt    DateTime @default(now())
+
+  // Only one item may be equipped per slot (enforced in the equip API).
+  equipped Boolean @default(false)
+
+  @@unique([userId, levelAwarded])
+  @@index([userId, rarity])
+}
+
+model Friendship {
+  id          String @id @default(cuid())
+  requesterId String
+  addresseeId String
+  requester   User   @relation("FriendRequestsSent", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee   User   @relation("FriendRequestsReceived", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+}
+
+model Message {
+  id          String @id @default(cuid())
+  senderId    String
+  recipientId String
+  sender      User   @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient   User   @relation("MessagesReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  body      String    @db.Text
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, readAt])
+}
+
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 enum Tier {
@@ -206,4 +354,30 @@ enum AnalysisStatus {
   RUNNING
   COMPLETE
   FAILED
+}
+
+enum TrophyKind {
+  BEST_SUBMISSION
+  MOST_XP
+  LONGEST_STREAK
+}
+
+enum EquipmentSlot {
+  WEAPON
+  ARMOR
+  HELM
+  RELIC
+}
+
+enum EquipmentRarity {
+  RARE
+  EPIC
+  UNIQUE
+  LEGENDARY
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

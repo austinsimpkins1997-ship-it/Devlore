@@ -1,15 +1,17 @@
 /**
- * DEVLORE — Gemini AI Narrative Generator
+ * DEVLORE — AI Narrative Generator
  *
- * Wraps Google Gemini 2.0 Flash to generate:
- * 1. Origin stories (one-time, on first login)
- * 2. Weekly saga chapters (recurring, every Monday)
+ * Generates origin stories, weekly chapters, and lore cards.
  *
- * Cost profile: ~$0.001 per origin story, ~$0.0005 per chapter
- * at Gemini 2.0 Flash rates (as of 2025).
+ * Provider-agnostic: requests go through lib/ai/client, which fails over
+ * across every configured free tier (Gemini, Groq, Cerebras, Mistral,
+ * OpenRouter). If all of them fail, callers fall back to the deterministic
+ * writer in lib/narrative/fallback.ts, so the product never hard-stops on a
+ * rate limit.
+ *
+ * The exported signatures are unchanged from the Gemini-only version.
  */
 
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import type {
   GitHubStats,
   OriginStoryResult,
@@ -18,6 +20,7 @@ import type {
   GeneratedLoreCard,
   HeroClassSlug,
 } from '@/types';
+import { generateText, parseJsonResponse } from '@/lib/ai/client';
 import {
   buildOriginStoryPrompt,
   buildChapterPrompt,
@@ -25,37 +28,17 @@ import {
 } from './prompts';
 import { assignHeroClass } from './hero-class';
 
-// ── Client Setup ──────────────────────────────────────────────────────────────
-
-function getAI() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('[generator] GEMINI_API_KEY is not set');
-  }
-  return new GoogleGenerativeAI(apiKey);
-}
-
-function getModel() {
-  const ai = getAI();
-  return ai.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    // Relaxed safety for creative fantasy writing
-    // (the content is never about real harm — it's fantasy metaphor)
-    safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT,        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,       threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
-    ],
-  });
-}
-
 // ── Retry Helper ──────────────────────────────────────────────────────────────
 
+/**
+ * Retries the whole failover chain. Provider-level failover already happens
+ * inside generateText; this covers transient faults that hit every provider at
+ * once (for example a brief network outage).
+ */
 async function withRetry<T>(
   fn: () => Promise<T>,
-  maxRetries = 3,
-  baseDelayMs = 1000,
+  maxRetries = 2,
+  baseDelayMs = 800,
 ): Promise<T> {
   let lastError: unknown;
 
@@ -64,34 +47,14 @@ async function withRetry<T>(
       return await fn();
     } catch (err) {
       lastError = err;
-      const isLast = attempt === maxRetries;
-      if (isLast) break;
-
-      // Exponential backoff with jitter
-      const delay = baseDelayMs * Math.pow(2, attempt - 1) + Math.random() * 500;
+      if (attempt === maxRetries) break;
+      const delay = baseDelayMs * Math.pow(2, attempt - 1) + Math.random() * 400;
       console.warn(`[generator] Attempt ${attempt} failed, retrying in ${Math.round(delay)}ms:`, err);
       await new Promise((r) => setTimeout(r, delay));
     }
   }
 
   throw lastError;
-}
-
-// ── JSON Parser ───────────────────────────────────────────────────────────────
-
-function parseJsonResponse<T>(text: string): T {
-  // Strip markdown code fences if Gemini wraps the JSON
-  const cleaned = text
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
-
-  try {
-    return JSON.parse(cleaned) as T;
-  } catch (err) {
-    throw new Error(`[generator] Failed to parse JSON response: ${err}\n\nRaw text:\n${text.slice(0, 500)}`);
-  }
 }
 
 // ── Origin Story Generation ───────────────────────────────────────────────────
@@ -108,22 +71,18 @@ export async function generateOriginStory(stats: GitHubStats): Promise<OriginSto
       openSourceContribCount: stats.openSourceContribCount,
     });
 
-    const prompt = buildOriginStoryPrompt(stats);
-
-    const model = getModel();
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.85,     // Slightly creative but consistent
-        topP: 0.92,
-        maxOutputTokens: 1024, // Origin story ~500 words ≈ 700 tokens
-      },
+    const { text, providerId } = await generateText({
+      prompt: buildOriginStoryPrompt(stats),
+      temperature: 0.85,
+      topP: 0.92,
+      maxTokens: 1024,
     });
 
-    const originStory = result.response.text().trim();
-
+    const originStory = text.trim();
     if (originStory.length < 100) {
-      throw new Error('[generator] Origin story too short — likely a safety block or empty response');
+      throw new Error(
+        `[generator] Origin story too short from ${providerId} — likely a safety block or empty response`,
+      );
     }
 
     return {
@@ -139,29 +98,22 @@ export async function generateOriginStory(stats: GitHubStats): Promise<OriginSto
 
 export async function generateWeeklyChapter(input: NarrativeInput): Promise<GeneratedChapter> {
   return withRetry(async () => {
-    const prompt = buildChapterPrompt(input);
-
-    const model = getModel();
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.80,
-        topP: 0.92,
-        maxOutputTokens: 2048, // Chapter ~700 words + JSON overhead ≈ 1200 tokens
-        responseMimeType: 'application/json',
-      },
+    const { text } = await generateText({
+      prompt: buildChapterPrompt(input),
+      json: true,
+      temperature: 0.8,
+      topP: 0.92,
+      maxTokens: 2048,
     });
 
-    const raw = result.response.text();
     const parsed = parseJsonResponse<{
       title: string;
       content: string;
       summary: string;
       xpEarned: number;
       newCards?: GeneratedLoreCard[];
-    }>(raw);
+    }>(text);
 
-    // Validate required fields
     if (!parsed.title || typeof parsed.title !== 'string') {
       throw new Error('[generator] Chapter missing required field: title');
     }
@@ -172,16 +124,15 @@ export async function generateWeeklyChapter(input: NarrativeInput): Promise<Gene
       throw new Error('[generator] Chapter missing required field: summary');
     }
 
-    // Clamp XP to sensible range
+    // Clamp XP so a hallucinated number can never distort progression.
     const xpEarned = Math.min(500, Math.max(25, Number(parsed.xpEarned) || 100));
 
-    // Validate new cards if present
     const newCards: GeneratedLoreCard[] = (parsed.newCards ?? [])
       .filter((c): c is GeneratedLoreCard =>
         typeof c === 'object' &&
         c !== null &&
         typeof c.name === 'string' &&
-        typeof c.flavorText === 'string'
+        typeof c.flavorText === 'string',
       )
       .map((c) => ({
         cardType: c.cardType ?? 'ACHIEVEMENT',
@@ -209,26 +160,17 @@ export async function generateLoreCard(
   context: string,
 ): Promise<{ name: string; flavorText: string }> {
   return withRetry(async () => {
-    const prompt = buildLoreCardPrompt(milestone, context);
-
-    const model = getModel();
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.9,
-        maxOutputTokens: 256,
-        responseMimeType: 'application/json',
-      },
+    const { text } = await generateText({
+      prompt: buildLoreCardPrompt(milestone, context),
+      json: true,
+      temperature: 0.9,
+      maxTokens: 256,
     });
 
-    const parsed = parseJsonResponse<{ name: string; flavorText: string }>(
-      result.response.text(),
-    );
-
+    const parsed = parseJsonResponse<{ name: string; flavorText: string }>(text);
     if (!parsed.name || !parsed.flavorText) {
       throw new Error('[generator] Lore card missing required fields');
     }
-
     return parsed;
   });
 }

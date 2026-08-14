@@ -1,0 +1,81 @@
+.panel {
+  padding: 1.75rem;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 12px;
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-rune), transparent);
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--color-rune);
+  font-size: 1.25rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.track {
+  background: rgba(18, 18, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1.1rem;
+}
+
+.trackHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.trackLabel {
+  color: var(--color-frost);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+}
+
+.trackCount {
+  color: var(--color-shadow);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.bar {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--color-rune-dim), var(--color-rune));
+  transition: width 0.4s ease;
+}
+
+.fillComplete {
+  background: linear-gradient(to right, #16a34a, #22c55e);
+}
+
+.trackMeta {
+  margin-top: 0.5rem;
+  color: var(--color-mist);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}

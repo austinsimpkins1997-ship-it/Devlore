@@ -9,10 +9,12 @@ interface DashboardTabsProps {
 
 const TABS = [
   { id: 'overview', label: '⚔️ Overview' },
+  { id: 'character', label: '🧙 Character' },
   { id: 'chronicles', label: '📖 Chronicles' },
   { id: 'collection', label: '🃏 Collection' },
   { id: 'quests', label: '🎯 Quests' },
   { id: 'forge', label: '🔥 The Forge' },
+  { id: 'fellowship', label: '🤝 Fellowship' },
 ];
 
 export function DashboardTabs({ activeTab, onTabChange }: DashboardTabsProps) {

@@ -1,0 +1,224 @@
+.wrapper {
+  padding: 1rem 0;
+}
+
+.summaryCard {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: rgba(13, 13, 26, 0.8);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summaryTitle {
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 1.1rem;
+}
+
+.summaryMeta {
+  margin: 0.5rem 0 0 0;
+  color: var(--color-mist);
+  font-size: 0.85rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  margin: 0 0 1.25rem 0;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.legendaryTitle {
+  color: var(--rarity-legendary);
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.questCard {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: rgba(18, 18, 42, 0.6);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left-width: 4px;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+.questCardLegendary {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(0, 0, 0, 0.4));
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+}
+
+.questCardClaimed {
+  opacity: 0.65;
+}
+
+.questIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.questBody {
+  flex: 1;
+  min-width: 200px;
+}
+
+.questTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.questTitleLegendary {
+  color: var(--rarity-legendary);
+}
+
+.questDesc {
+  margin: 0.25rem 0 0.6rem 0;
+  color: var(--color-mist);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+}
+
+.progressTrack {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(to right, var(--color-rune-dim), var(--color-rune));
+  transition: width 0.4s ease;
+}
+
+.progressFillDone {
+  background: linear-gradient(to right, #16a34a, #22c55e);
+}
+
+.progressLabel {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--color-shadow);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.questMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.difficultyChip {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.xpLabel {
+  color: #fff;
+  font-weight: bold;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.claimBtn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+  font-family: var(--font-body);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.claimBtn:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.claimBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.pendingBtn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-shadow);
+  font-family: var(--font-body);
+  cursor: default;
+}
+
+.claimedTag {
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--color-success);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.lockLink {
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(124, 58, 237, 0.5);
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--color-arcane-glow);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.feedback {
+  margin: 0 0 1.5rem 0;
+  padding: 0.9rem 1.25rem;
+  border-radius: 0.6rem;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+}
+
+.feedbackSuccess {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: var(--color-success);
+}
+
+.feedbackError {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--color-danger);
+}
+
+.stateMsg {
+  color: var(--color-mist);
+  padding: 2rem 0;
+  text-align: center;
+}

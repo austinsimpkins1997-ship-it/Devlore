@@ -10,6 +10,16 @@ import { GenerateChapterButton } from '@/components/dashboard/GenerateChapterBut
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import QuestsPanel from '@/components/dashboard/QuestsPanel';
 import ForgePanel from '@/components/dashboard/ForgePanel';
+import { MilestonesPanel } from '@/components/saga/MilestonesPanel';
+import { TrophyCase, type TrophyDisplay } from '@/components/saga/TrophyCase';
+import { BadgeShelf } from '@/components/saga/BadgeShelf';
+import { Armory, type EquipmentDisplay } from '@/components/saga/Armory';
+import EquipmentPanel from '@/components/character/EquipmentPanel';
+import { CharacterCreator } from '@/components/character/CharacterCreator';
+import FellowshipPanel from '@/components/dashboard/FellowshipPanel';
+import { buildMilestoneTracks } from '@/lib/milestones';
+import type { ProfileBadge } from '@/lib/badges';
+import type { CharacterAppearance } from '@/lib/character';
 import Link from 'next/link';
 
 /* ── Types (inline, match Prisma shape) ── */
@@ -53,6 +63,11 @@ interface DashboardUser {
   originStory: string | null;
   chapters: Chapter[];
   loreCards: LoreCardData[];
+  trophies: TrophyDisplay[];
+  equipment: EquipmentDisplay[];
+  badges: ProfileBadge[];
+  appearance: CharacterAppearance;
+  charCreated: boolean;
 }
 
 interface DashboardClientProps {
@@ -61,10 +76,34 @@ interface DashboardClientProps {
   hasHeroClass: boolean;
 }
 
-type Tab = 'overview' | 'chronicles' | 'collection' | 'quests' | 'forge';
+type Tab =
+  | 'overview'
+  | 'character'
+  | 'chronicles'
+  | 'collection'
+  | 'quests'
+  | 'forge'
+  | 'fellowship';
 
 export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [needsCharacter, setNeedsCharacter] = useState(!user.charCreated);
+
+  // First login: forge your hero before the dashboard opens.
+  if (needsCharacter) {
+    return (
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem' }}>
+        <CharacterCreator
+          initial={user.appearance}
+          firstRun
+          onSaved={() => {
+            setNeedsCharacter(false);
+            window.location.reload();
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -91,6 +130,12 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
           </Link>
           <Link href="/arena" style={{ color: 'var(--color-mist)', textDecoration: 'none', fontSize: '0.875rem' }}>
             ⚔️ Arena
+          </Link>
+          <Link href="/leaderboard" style={{ color: 'var(--color-mist)', textDecoration: 'none', fontSize: '0.875rem' }}>
+            🏆 Leaderboard
+          </Link>
+          <Link href="/heroes" style={{ color: 'var(--color-mist)', textDecoration: 'none', fontSize: '0.875rem' }}>
+            🧭 Heroes
           </Link>
           <Link href="/dashboard/settings" style={{
             padding: '0.5rem 1rem',
@@ -168,6 +213,7 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
                   { label: 'Longest Streak', value: `${user.longestStreak}d`, icon: '⚡' },
                   { label: 'Lore Cards', value: user.loreCards.length, icon: '🃏' },
                   { label: 'Chapters', value: user.chapters.length, icon: '📖' },
+                  { label: 'Trophies', value: user.trophies.length, icon: '🏆' },
                 ].map((stat) => (
                   <div key={stat.label} style={{ padding: '1.25rem', background: 'var(--color-abyss)', border: '1px solid var(--color-dusk)', borderRadius: '10px', textAlign: 'center' }}>
                     <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{stat.icon}</div>
@@ -176,6 +222,22 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
                   </div>
                 ))}
               </div>
+
+              {/* Milestones */}
+              <MilestonesPanel
+                tracks={buildMilestoneTracks({
+                  totalCommits: user.totalCommits,
+                  currentStreak: user.currentStreak,
+                  longestStreak: user.longestStreak,
+                  chaptersCount: user.chapters.length,
+                })}
+              />
+
+              {/* Badges */}
+              <BadgeShelf badges={user.badges} />
+
+              {/* Trophy Case */}
+              <TrophyCase trophies={user.trophies} />
 
               {/* Latest Chapter or Generate Button */}
               {user.chapters.length === 0 ? (
@@ -200,6 +262,23 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
                 </div>
               )}
             </div>
+          )}
+
+          {/* ── Tab: Character ── */}
+          {activeTab === 'character' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Opening the armory...</div>}>
+                <EquipmentPanel />
+              </Suspense>
+              <Armory equipment={user.equipment} title="🗡️ All Gear Earned" />
+            </div>
+          )}
+
+          {/* ── Tab: Fellowship ── */}
+          {activeTab === 'fellowship' && (
+            <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Gathering your fellowship...</div>}>
+              <FellowshipPanel />
+            </Suspense>
           )}
 
           {/* ── Tab: Chronicles ── */}
@@ -250,16 +329,16 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
           )}
 
           {/* ── Tab: Quests ── */}
-          {activeTab === 'quests' && QuestsPanel && (
+          {activeTab === 'quests' && (
             <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Loading quests...</div>}>
               <QuestsPanel />
             </Suspense>
           )}
 
           {/* ── Tab: The Forge ── */}
-          {activeTab === 'forge' && ForgePanel && (
+          {activeTab === 'forge' && (
             <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Loading The Forge...</div>}>
-              <ForgePanel userId={user.username ?? 'anonymous'} />
+              <ForgePanel />
             </Suspense>
           )}
         </>

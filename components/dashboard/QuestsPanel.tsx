@@ -1,145 +1,243 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import styles from './QuestsPanel.module.css';
 
-const DAILY_QUESTS = [
-  { id: 'dq1', title: 'The First Watch', desc: 'Make a commit or write a journal entry today', xp: 75, icon: '⚔️', difficulty: 'Easy' },
-  { id: 'dq2', title: 'Chronicle Keeper', desc: 'Use The Forge to record today in your saga', xp: 100, icon: '📖', difficulty: 'Easy' },
-  { id: 'dq3', title: 'The Comparison', desc: 'Visit the Arena to test your legend', xp: 50, icon: '🏟️', difficulty: 'Easy' },
-];
-
-const WEEKLY_QUESTS = [
-  { id: 'wq1', title: 'The Relentless', desc: '5 consecutive days of commits this week', xp: 500, icon: '🔥', difficulty: 'Hard' },
-  { id: 'wq2', title: 'The Polymath', desc: 'Commit in 3 different repositories', xp: 300, icon: '🌐', difficulty: 'Medium' },
-  { id: 'wq3', title: 'The Scholar', desc: 'Generate a Forge entry longer than 100 words', xp: 200, icon: '📚', difficulty: 'Medium' },
-  { id: 'wq4', title: 'Weekend Warrior', desc: 'Make commits on both Saturday and Sunday', xp: 350, icon: '🛡️', difficulty: 'Medium' },
-];
-
-const LEGENDARY_CHALLENGE = {
-  id: 'lc1', title: 'The Iron Month', desc: 'Code every single day for 30 days straight', xp: 5000, icon: '👑', difficulty: 'Legendary'
-};
-
-const getDifficultyColor = (difficulty: string) => {
-  switch (difficulty) {
-    case 'Easy': return '#22c55e'; // green
-    case 'Medium': return '#3b82f6'; // blue
-    case 'Hard': return '#ea580c'; // orange
-    case 'Legendary': return '#f59e0b'; // gold
-    default: return '#94a3b8';
-  }
-};
-
-interface Quest {
-  id: string;
+interface QuestItem {
+  slug: string;
   title: string;
-  desc: string;
-  xp: number;
+  description: string;
   icon: string;
-  difficulty: string;
+  cadence: 'DAILY' | 'WEEKLY' | 'MILESTONE';
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Legendary';
+  target: number;
+  xpReward: number;
+  progress: number;
+  completed: boolean;
+  claimed: boolean;
+  lockedForTier: boolean;
+  requiresTier: 'PRO' | 'LEGEND' | null;
 }
 
-const QuestCard = ({ quest }: { quest: Quest }) => {
-  const color = getDifficultyColor(quest.difficulty);
-  const isLegendary = quest.difficulty === 'Legendary';
-  
-  return (
-    <div 
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '1.25rem',
-        background: isLegendary ? 'linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4))' : 'rgba(18, 18, 42, 0.6)',
-        borderRadius: '0.75rem',
-        borderLeft: `4px solid ${color}`,
-        border: isLegendary ? `1px solid rgba(245, 158, 11, 0.3)` : undefined,
-        borderLeftWidth: '4px',
-        borderLeftColor: color,
-        marginBottom: '1rem',
-        boxShadow: isLegendary ? '0 0 15px rgba(245, 158, 11, 0.15)' : 'none',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
-      <div style={{ fontSize: '2rem', marginRight: '1.25rem' }}>{quest.icon}</div>
-      <div style={{ flex: 1 }}>
-        <h4 style={{ margin: 0, fontFamily: 'var(--font-heading)', color: isLegendary ? '#f59e0b' : '#fff', fontSize: '1.1rem' }}>
-          {quest.title}
-        </h4>
-        <p style={{ margin: '0.25rem 0 0 0', color: 'var(--color-mist, #94a3b8)', fontSize: '0.9rem', fontFamily: 'var(--font-body)' }}>
-          {quest.desc}
-        </p>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-        <span style={{ 
-          background: `rgba(${isLegendary ? '245, 158, 11' : '255, 255, 255'}, 0.1)`, 
-          color: color, 
-          padding: '0.25rem 0.5rem', 
-          borderRadius: '0.25rem', 
-          fontSize: '0.75rem', 
-          fontWeight: 'bold',
-          textTransform: 'uppercase'
-        }}>
-          {quest.difficulty}
-        </span>
-        <span style={{ color: '#fff', fontWeight: 'bold', fontFamily: 'var(--font-mono)' }}>+{quest.xp} XP</span>
-      </div>
-      <button 
-        onClick={() => alert('Quest tracking is live in Pro — coming to all tiers soon!')}
-        style={{
-          marginLeft: '1rem',
-          padding: '0.5rem 1rem',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: '#fff',
-          borderRadius: '0.5rem',
-          cursor: 'pointer',
-          fontFamily: 'var(--font-body)',
-          transition: 'background 0.2s'
-        }}
-        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
-        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
-      >
-        Claim XP
-      </button>
-    </div>
-  );
+interface QuestBoardData {
+  quests: QuestItem[];
+  claimableXp: number;
+  tier: 'FREE' | 'PRO' | 'LEGEND';
+}
+
+const DIFFICULTY_COLORS: Record<QuestItem['difficulty'], string> = {
+  Easy: '#22c55e',
+  Medium: '#3b82f6',
+  Hard: '#ea580c',
+  Legendary: '#f59e0b',
 };
 
-export default function QuestsPanel() {
-  const totalWeeklyXp = WEEKLY_QUESTS.reduce((acc, q) => acc + q.xp, 0);
+function QuestCard({
+  quest,
+  claiming,
+  onClaim,
+}: {
+  quest: QuestItem;
+  claiming: boolean;
+  onClaim: (slug: string) => void;
+}) {
+  const isLegendary = quest.difficulty === 'Legendary';
+  const color = DIFFICULTY_COLORS[quest.difficulty];
+  const pct = Math.min(100, Math.round((quest.progress / quest.target) * 100));
+
+  let action: React.ReactNode;
+  if (quest.claimed) {
+    action = <span className={styles.claimedTag}>Claimed ✓</span>;
+  } else if (quest.lockedForTier) {
+    action = (
+      <Link href="/pricing" className={styles.lockLink}>
+        🔒 Pro Quest
+      </Link>
+    );
+  } else if (quest.completed) {
+    action = (
+      <button className={styles.claimBtn} disabled={claiming} onClick={() => onClaim(quest.slug)}>
+        {claiming ? 'Claiming...' : 'Claim XP'}
+      </button>
+    );
+  } else {
+    action = <span className={styles.pendingBtn}>In Progress</span>;
+  }
+
+  const cardClasses = [
+    styles.questCard,
+    isLegendary ? styles.questCardLegendary : '',
+    quest.claimed ? styles.questCardClaimed : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div style={{ padding: '1rem 0' }}>
-      <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(13, 13, 26, 0.8)', borderRadius: '0.75rem', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-        <h3 style={{ margin: '0 0 0.5rem 0', fontFamily: 'var(--font-heading)', color: '#fff' }}>Weekly Progress</h3>
-        <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-          <div style={{ width: '0%', height: '100%', background: 'var(--color-rune, #f59e0b)' }} />
+    <div className={cardClasses} style={{ borderLeftColor: color }}>
+      <div className={styles.questIcon}>{quest.icon}</div>
+      <div className={styles.questBody}>
+        <h4 className={`${styles.questTitle} ${isLegendary ? styles.questTitleLegendary : ''}`}>
+          {quest.title}
+        </h4>
+        <p className={styles.questDesc}>{quest.description}</p>
+        <div className={styles.progressTrack}>
+          <div
+            className={`${styles.progressFill} ${quest.completed ? styles.progressFillDone : ''}`}
+            style={{ width: `${pct}%` }}
+          />
         </div>
-        <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-mist, #94a3b8)', fontSize: '0.85rem' }}>
-          0 / {totalWeeklyXp} XP available this week
+        <span className={styles.progressLabel}>
+          {quest.progress.toLocaleString()} / {quest.target.toLocaleString()}
+        </span>
+      </div>
+      <div className={styles.questMeta}>
+        <span className={styles.difficultyChip} style={{ color }}>
+          {quest.difficulty}
+        </span>
+        <span className={styles.xpLabel}>+{quest.xpReward.toLocaleString()} XP</span>
+        {action}
+      </div>
+    </div>
+  );
+}
+
+export default function QuestsPanel() {
+  const [board, setBoard] = useState<QuestBoardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [claimingSlug, setClaimingSlug] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+
+  const loadBoard = useCallback(async () => {
+    try {
+      const res = await fetch('/api/quests');
+      if (!res.ok) throw new Error('Failed to load quests');
+      const data: QuestBoardData = await res.json();
+      setBoard(data);
+      setLoadError(null);
+    } catch {
+      setLoadError('Could not load your quest board. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBoard();
+  }, [loadBoard]);
+
+  const handleClaim = async (slug: string) => {
+    if (claimingSlug) return;
+    setClaimingSlug(slug);
+    setFeedback(null);
+    try {
+      const res = await fetch('/api/quests/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(typeof data?.error === 'string' ? data.error : 'Claim failed');
+      }
+      setFeedback({
+        kind: 'success',
+        text: data.leveledUp
+          ? `+${data.xpAwarded} XP claimed — you reached Level ${data.newLevel}! ⬆`
+          : `+${data.xpAwarded} XP claimed!`,
+      });
+      await loadBoard();
+    } catch (err) {
+      setFeedback({
+        kind: 'error',
+        text: err instanceof Error ? err.message : 'Claim failed. Please try again.',
+      });
+    } finally {
+      setClaimingSlug(null);
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.stateMsg}>Consulting the quest ledger...</div>;
+  }
+  if (loadError || !board) {
+    return <div className={styles.stateMsg}>{loadError ?? 'Could not load quests.'}</div>;
+  }
+
+  const daily = board.quests.filter((q) => q.cadence === 'DAILY');
+  const weekly = board.quests.filter((q) => q.cadence === 'WEEKLY');
+  const milestones = board.quests.filter(
+    (q) => q.cadence === 'MILESTONE' && q.difficulty !== 'Legendary',
+  );
+  const legendary = board.quests.filter(
+    (q) => q.cadence === 'MILESTONE' && q.difficulty === 'Legendary',
+  );
+
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.summaryCard}>
+        <h3 className={styles.summaryTitle}>Quest Ledger</h3>
+        <p className={styles.summaryMeta}>
+          {board.claimableXp > 0
+            ? `${board.claimableXp.toLocaleString()} XP ready to claim — quests reset daily and weekly (UTC).`
+            : 'Complete quests by forging entries and keeping your streaks alive. Daily and weekly quests reset automatically (UTC).'}
+          {board.tier === 'LEGEND' && ' Legend heroes earn 1.5× quest XP.'}
         </p>
       </div>
 
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ fontFamily: 'var(--font-heading)', color: '#fff', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      {feedback && (
+        <p
+          className={`${styles.feedback} ${
+            feedback.kind === 'success' ? styles.feedbackSuccess : styles.feedbackError
+          }`}
+        >
+          {feedback.text}
+        </p>
+      )}
+
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           <span style={{ color: '#22c55e' }}>✦</span> Daily Quests
         </h2>
-        {DAILY_QUESTS.map(q => <QuestCard key={q.id} quest={q} />)}
+        {daily.map((q) => (
+          <QuestCard key={q.slug} quest={q} claiming={claimingSlug === q.slug} onClaim={handleClaim} />
+        ))}
       </div>
 
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ fontFamily: 'var(--font-heading)', color: '#fff', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           <span style={{ color: '#3b82f6' }}>✦</span> Weekly Quests
+          {board.tier === 'FREE' && (
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-arcane-glow)', fontFamily: 'var(--font-body)' }}>
+              — claiming unlocks with Pro
+            </span>
+          )}
         </h2>
-        {WEEKLY_QUESTS.map(q => <QuestCard key={q.id} quest={q} />)}
+        {weekly.map((q) => (
+          <QuestCard key={q.slug} quest={q} claiming={claimingSlug === q.slug} onClaim={handleClaim} />
+        ))}
       </div>
 
-      <div>
-        <h2 style={{ fontFamily: 'var(--font-heading)', color: '#f59e0b', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textShadow: '0 0 10px rgba(245, 158, 11, 0.5)' }}>
-          <span style={{ color: '#f59e0b' }}>✧</span> Legendary Challenge <span style={{ color: '#f59e0b' }}>✧</span>
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
+          <span style={{ color: 'var(--color-rune)' }}>✦</span> Milestones
         </h2>
-        <QuestCard quest={LEGENDARY_CHALLENGE} />
+        {milestones.map((q) => (
+          <QuestCard key={q.slug} quest={q} claiming={claimingSlug === q.slug} onClaim={handleClaim} />
+        ))}
       </div>
+
+      {legendary.length > 0 && (
+        <div className={styles.section}>
+          <h2 className={`${styles.sectionTitle} ${styles.legendaryTitle}`}>
+            ✧ Legendary Challenge ✧
+          </h2>
+          {legendary.map((q) => (
+            <QuestCard key={q.slug} quest={q} claiming={claimingSlug === q.slug} onClaim={handleClaim} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
