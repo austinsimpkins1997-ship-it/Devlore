@@ -9,7 +9,7 @@ export function calculateNightCommitRatio(days: ContributionDay[], commitsByHour
   return 0.1;
 }
 
-export function calculateHeroClassSignals(stats: GitHubStats, repos: Array<{name: string; full_name: string; language: string | null; size: number; stargazers_count: number; topics: string[]; private: boolean;}>) {
+export function calculateHeroClassSignals(stats: GitHubStats, _repos: Array<{name: string; full_name: string; language: string | null; size: number; stargazers_count: number; topics: string[]; private: boolean;}>) {
   const sortedLangs = Object.entries(stats.topLanguages).sort((a,b)=>b[1]-a[1]);
   const topLang = sortedLangs.length > 0 ? sortedLangs[0][0] : 'Unknown';
   

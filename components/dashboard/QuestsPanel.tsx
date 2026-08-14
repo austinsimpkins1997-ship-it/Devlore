@@ -29,7 +29,16 @@ const getDifficultyColor = (difficulty: string) => {
   }
 };
 
-const QuestCard = ({ quest }: { quest: any }) => {
+interface Quest {
+  id: string;
+  title: string;
+  desc: string;
+  xp: number;
+  icon: string;
+  difficulty: string;
+}
+
+const QuestCard = ({ quest }: { quest: Quest }) => {
   const color = getDifficultyColor(quest.difficulty);
   const isLegendary = quest.difficulty === 'Legendary';
   

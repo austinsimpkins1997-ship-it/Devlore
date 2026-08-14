@@ -43,7 +43,7 @@ export async function getLanguageStats(accessToken: string, repos: string[]): Pr
         if (!stats[lang]) stats[lang] = 0;
         stats[lang] += bytes as number;
       }
-    } catch (_e) {
+    } catch {
       // Ignore errors for individual repos
     }
   }
@@ -62,7 +62,7 @@ export async function getCommitMessages(accessToken: string, owner: string, repo
       per_page: 100
     });
     return response.data.map(commit => commit.commit.message);
-  } catch (_e) {
+  } catch {
     return [];
   }
 }

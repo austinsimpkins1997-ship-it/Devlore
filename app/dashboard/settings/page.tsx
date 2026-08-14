@@ -7,6 +7,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
 
 interface UserSettings {
   isPublic: boolean;
@@ -80,7 +81,7 @@ export default function SettingsPage() {
         <Card style={{ padding: '2rem', background: 'var(--color-abyss)', border: '1px solid var(--color-dusk)' }}>
           <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-frost)', marginBottom: '1.5rem' }}>Profile</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <img src={session?.user?.image || ''} alt="Avatar" style={{ width: '64px', height: '64px', borderRadius: '50%', border: '2px solid var(--color-dusk)' }} />
+            <Image src={session?.user?.image || 'https://avatars.githubusercontent.com/u/0'} alt="Avatar" width={64} height={64} style={{ borderRadius: '50%', border: '2px solid var(--color-dusk)' }} />
             <div>
               <div style={{ color: 'var(--color-frost)', fontWeight: 'bold' }}>{session?.user?.name}</div>
               <div style={{ color: 'var(--color-mist)', fontSize: '0.875rem' }}>{session?.user?.email}</div>

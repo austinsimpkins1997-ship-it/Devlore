@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import styles from './CodexHeader.module.css';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -43,7 +44,7 @@ export const CodexHeader: React.FC<CodexHeaderProps> = ({ user }) => {
       <div className={styles.content}>
         <div className={styles.avatarWrapper}>
           {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.displayName} className={styles.avatar} />
+            <Image src={user.avatarUrl} alt={user.displayName} width={80} height={80} className={styles.avatar} />
           ) : (
             <div className={styles.avatarPlaceholder}>{user.displayName.charAt(0)}</div>
           )}

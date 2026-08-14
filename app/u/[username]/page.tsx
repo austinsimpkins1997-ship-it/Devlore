@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { CodexHeader } from '@/components/saga/CodexHeader';
 import { SagaTimeline } from '@/components/saga/SagaTimeline';
@@ -42,14 +41,14 @@ export default async function PublicCodexPage({ params }: { params: Promise<{ us
 
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 2rem 4rem 2rem' }}>
-      <CodexHeader user={user as any} />
+      <CodexHeader user={user as Parameters<typeof CodexHeader>[0]['user']} />
 
       <section style={{ marginTop: '4rem' }}>
         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-frost)', borderBottom: '1px solid var(--color-dusk)', paddingBottom: '1rem', marginBottom: '2rem' }}>
           The Chronicles
         </h2>
         {user.chapters.length > 0 ? (
-          <SagaTimeline chapters={user.chapters as any} isPublicView={true} />
+          <SagaTimeline chapters={user.chapters as Parameters<typeof SagaTimeline>[0]['chapters']} isPublicView={true} />
         ) : (
           <p style={{ color: 'var(--color-mist)', fontStyle: 'italic' }}>The saga has just begun...</p>
         )}
@@ -62,7 +61,7 @@ export default async function PublicCodexPage({ params }: { params: Promise<{ us
         {user.loreCards.length > 0 ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1.5rem' }}>
             {user.loreCards.map(card => (
-              <LoreCard key={card.id} card={card as any} />
+              <LoreCard key={card.id} card={card as Parameters<typeof LoreCard>[0]['card']} />
             ))}
           </div>
         ) : (

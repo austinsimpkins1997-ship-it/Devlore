@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import styles from './HeroCard.module.css';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -33,7 +34,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   xp,
   tier,
   currentStreak,
-  longestStreak,
+  _longestStreak,
   totalCommits,
   firstCommitDate,
 }) => {
@@ -66,7 +67,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       <div className={styles.header}>
         <div className={styles.avatarContainer}>
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName} className={styles.avatar} />
+            <Image src={avatarUrl} alt={displayName} width={80} height={80} className={styles.avatar} />
           ) : (
             <div className={styles.avatarPlaceholder}>{displayName.charAt(0)}</div>
           )}

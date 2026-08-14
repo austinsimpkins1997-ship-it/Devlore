@@ -44,7 +44,7 @@ export default async function CollectionPage() {
       {cards.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '2rem' }}>
           {cards.map(card => (
-            <LoreCard key={card.id} card={card as any} />
+            <LoreCard key={card.id} card={card as Parameters<typeof LoreCard>[0]['card']} />
           ))}
         </div>
       ) : (

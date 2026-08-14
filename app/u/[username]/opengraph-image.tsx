@@ -63,6 +63,7 @@ export default async function Image({ params }: { params: Promise<{ username: st
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '60px' }}>
             <img 
               src={user.avatarUrl || `https://github.com/${user.username}.png`} 
+              alt={user.displayName}
               width="200" 
               height="200" 
               style={{ borderRadius: '100px', border: '4px solid #c9a84c', marginBottom: '20px' }} 

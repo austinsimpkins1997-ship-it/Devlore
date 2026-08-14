@@ -48,7 +48,7 @@ export default async function ChaptersPage({
       )}
 
       {chapters.length > 0 ? (
-        <SagaTimeline chapters={chapters as any} lockedAfter={user?.tier === 'FREE' ? 2 : undefined} />
+        <SagaTimeline chapters={chapters as Parameters<typeof SagaTimeline>[0]['chapters']} lockedAfter={user?.tier === 'FREE' ? 2 : undefined} />
       ) : (
         <p style={{ color: 'var(--color-mist)', textAlign: 'center', marginTop: '4rem' }}>No chapters have been written yet.</p>
       )}
