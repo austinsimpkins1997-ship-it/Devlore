@@ -4,12 +4,17 @@ import React, { useState } from 'react';
 import { HeroAvatar } from './HeroAvatar';
 import styles from './CharacterCreator.module.css';
 import {
+  APPEARANCE_COMBINATIONS,
   AURAS,
   BODIES,
   CLOAKS,
   DEFAULT_APPEARANCE,
+  EYES,
   HAIRS,
+  MARKINGS,
+  PRESETS,
   SKINS,
+  randomAppearance,
   type AppearanceOption,
   type CharacterAppearance,
 } from '@/lib/character';
@@ -31,6 +36,8 @@ const GROUPS: Array<{
   { key: 'charBody', label: 'Build', options: BODIES, showSwatch: false },
   { key: 'charSkin', label: 'Skin', options: SKINS, showSwatch: true },
   { key: 'charHair', label: 'Hair', options: HAIRS, showSwatch: true },
+  { key: 'charEyes', label: 'Eyes', options: EYES, showSwatch: true },
+  { key: 'charMarking', label: 'Markings', options: MARKINGS, showSwatch: true },
   { key: 'charCloak', label: 'Cloak', options: CLOAKS, showSwatch: true },
   { key: 'charAura', label: 'Aura', options: AURAS, showSwatch: true },
 ];
@@ -79,6 +86,16 @@ export function CharacterCreator({
             equippedSlots={['WEAPON', 'ARMOR', 'HELM', 'RELIC']}
           />
         </div>
+        <button
+          type="button"
+          className={styles.randomBtn}
+          onClick={() => setAppearance(randomAppearance())}
+        >
+          🎲 Randomize
+        </button>
+        <p className={styles.comboCount}>
+          {APPEARANCE_COMBINATIONS.toLocaleString()} possible heroes
+        </p>
       </div>
 
       <div>
@@ -90,6 +107,23 @@ export function CharacterCreator({
             ? 'Every legend needs a face. Choose your look — you can change it any time from the Character tab. Gear you earn will appear on this figure.'
             : 'Adjust your appearance. Equipped gear is shown on the preview.'}
         </p>
+
+        <div className={styles.group}>
+          <span className={styles.groupLabel}>Archetypes</span>
+          <div className={styles.options}>
+            {PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                className={styles.presetBtn}
+                title={preset.blurb}
+                onClick={() => setAppearance(preset.appearance)}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {GROUPS.map((group) => (
           <div key={group.key} className={styles.group}>

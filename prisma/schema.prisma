@@ -101,6 +101,8 @@ model User {
   charHair      String  @default("raven")
   charCloak     String  @default("wanderer")
   charAura      String  @default("none")
+  charEyes      String  @default("slate")
+  charMarking   String  @default("none")
   charCreated   Boolean @default(false)
 
   // Settings

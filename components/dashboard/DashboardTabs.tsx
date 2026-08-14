@@ -10,6 +10,7 @@ interface DashboardTabsProps {
 const TABS = [
   { id: 'overview', label: '⚔️ Overview' },
   { id: 'character', label: '🧙 Character' },
+  { id: 'inventory', label: '🎒 Inventory' },
   { id: 'chronicles', label: '📖 Chronicles' },
   { id: 'collection', label: '🃏 Collection' },
   { id: 'quests', label: '🎯 Quests' },

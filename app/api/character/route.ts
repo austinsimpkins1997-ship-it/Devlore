@@ -18,7 +18,7 @@ export async function GET() {
       where: { id: session.user.id },
       select: {
         charBody: true, charSkin: true, charHair: true, charCloak: true,
-        charAura: true, charCreated: true,
+        charAura: true, charEyes: true, charMarking: true, charCreated: true,
         level: true, xp: true, tier: true,
         currentStreak: true, longestStreak: true, totalCommits: true,
         languageCount: true, openSourceContribCount: true,
@@ -45,6 +45,7 @@ export async function GET() {
       appearance: {
         charBody: user.charBody, charSkin: user.charSkin, charHair: user.charHair,
         charCloak: user.charCloak, charAura: user.charAura,
+        charEyes: user.charEyes, charMarking: user.charMarking,
       },
       charCreated: user.charCreated,
       hero: {
@@ -85,6 +86,8 @@ export async function PATCH(req: NextRequest) {
     charHair: typeof payload.charHair === 'string' ? payload.charHair : undefined,
     charCloak: typeof payload.charCloak === 'string' ? payload.charCloak : undefined,
     charAura: typeof payload.charAura === 'string' ? payload.charAura : undefined,
+    charEyes: typeof payload.charEyes === 'string' ? payload.charEyes : undefined,
+    charMarking: typeof payload.charMarking === 'string' ? payload.charMarking : undefined,
   });
 
   await prisma.user.update({

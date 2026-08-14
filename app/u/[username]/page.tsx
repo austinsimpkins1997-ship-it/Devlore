@@ -97,6 +97,8 @@ export default async function PublicCodexPage({ params }: { params: Promise<{ us
               charHair: user.charHair,
               charCloak: user.charCloak,
               charAura: user.charAura,
+              charEyes: user.charEyes,
+              charMarking: user.charMarking,
             }}
             size={200}
             equippedSlots={equippedSlots}

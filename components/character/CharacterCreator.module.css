@@ -133,3 +133,43 @@
   font-size: 0.85rem;
   margin: 0.75rem 0 0 0;
 }
+
+.randomBtn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.45);
+  color: var(--color-arcane-glow);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.randomBtn:hover {
+  background: rgba(124, 58, 237, 0.22);
+}
+
+.comboCount {
+  margin: 0;
+  color: var(--color-shadow);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.presetBtn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(18, 18, 42, 0.7);
+  border: 1px solid var(--color-twilight);
+  color: var(--color-mist);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
+}
+
+.presetBtn:hover {
+  border-color: var(--color-rune);
+  color: var(--color-frost);
+  background: rgba(201, 168, 76, 0.1);
+}

@@ -1,0 +1,204 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.summaryBox {
+  padding: 1.1rem;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.summaryValue {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--color-rune);
+}
+
+.summaryLabel {
+  color: var(--color-shadow);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filterBtn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(18, 18, 42, 0.7);
+  border: 1px solid var(--color-twilight);
+  color: var(--color-mist);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
+}
+
+.filterBtn:hover {
+  border-color: var(--color-rune-dim);
+  color: var(--color-frost);
+}
+
+.filterActive {
+  border-color: var(--color-rune);
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--color-frost);
+  font-weight: 600;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.sortSelect {
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-twilight);
+  color: var(--color-frost);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.item {
+  padding: 1.1rem;
+  border-radius: 10px;
+  background: rgba(18, 18, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left-width: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.itemEquipped {
+  background: linear-gradient(150deg, rgba(201, 168, 76, 0.1), rgba(13, 13, 26, 0.85));
+  border-color: rgba(201, 168, 76, 0.35);
+}
+
+.itemHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.itemIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.itemName {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 0.95rem;
+}
+
+.itemSlot {
+  display: block;
+  color: var(--color-shadow);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}
+
+.itemFlavor {
+  margin: 0;
+  color: var(--color-mist);
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.itemStats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.rarityTag {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.powerTag {
+  color: var(--color-rune);
+}
+
+.equipBtn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid;
+  width: 100%;
+}
+
+.equipBtnOn {
+  background: rgba(201, 168, 76, 0.15);
+  border-color: rgba(201, 168, 76, 0.5);
+  color: var(--color-rune);
+}
+
+.equipBtnOff {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: var(--color-success);
+}
+
+.equipBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  background: var(--color-abyss);
+  border: 1px dashed var(--color-dusk);
+  border-radius: 12px;
+  color: var(--color-mist);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.stateMsg {
+  color: var(--color-mist);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0;
+}

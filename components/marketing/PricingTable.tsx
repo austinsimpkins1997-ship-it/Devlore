@@ -3,6 +3,7 @@
 import React from 'react';
 import styles from './PricingTable.module.css';
 import { Button } from '../ui/Button';
+import { UpgradeButton } from '../billing/UpgradeButton';
 
 export const PricingTable: React.FC = () => {
   return (
@@ -66,13 +67,7 @@ export const PricingTable: React.FC = () => {
             <li className={styles.included}>Chronicle emails & manual re-analysis</li>
           </ul>
 
-          <Button
-            variant="primary"
-            className={styles.cta}
-            onClick={() => (window.location.href = '/sign-in?plan=pro')}
-          >
-            Begin Your Legend
-          </Button>
+          <UpgradeButton plan="PRO" label="Start 14-day trial" style={{ width: '100%' }} />
         </div>
 
         {/* LEGEND TIER */}
@@ -95,13 +90,7 @@ export const PricingTable: React.FC = () => {
             <li className={styles.included}>First access to new Legend features</li>
           </ul>
 
-          <Button
-            variant="secondary"
-            className={styles.cta}
-            onClick={() => (window.location.href = '/sign-in?plan=legend')}
-          >
-            Become Legendary
-          </Button>
+          <UpgradeButton plan="LEGEND" label="Become Legendary" style={{ width: '100%' }} />
         </div>
       </div>
     </section>

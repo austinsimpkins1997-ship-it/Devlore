@@ -110,6 +110,8 @@ export default async function DashboardPage() {
       charHair: user.charHair,
       charCloak: user.charCloak,
       charAura: user.charAura,
+      charEyes: user.charEyes,
+      charMarking: user.charMarking,
     },
     charCreated: user.charCreated,
   };

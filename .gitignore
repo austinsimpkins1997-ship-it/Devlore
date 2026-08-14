@@ -34,3 +34,8 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Local deploy/diagnostic reports - can contain credentials in command output
+deploy-report.txt
+alias-report.txt
+ship-report.txt

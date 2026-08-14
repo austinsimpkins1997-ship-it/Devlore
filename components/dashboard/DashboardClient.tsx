@@ -13,8 +13,9 @@ import ForgePanel from '@/components/dashboard/ForgePanel';
 import { MilestonesPanel } from '@/components/saga/MilestonesPanel';
 import { TrophyCase, type TrophyDisplay } from '@/components/saga/TrophyCase';
 import { BadgeShelf } from '@/components/saga/BadgeShelf';
-import { Armory, type EquipmentDisplay } from '@/components/saga/Armory';
+import type { EquipmentDisplay } from '@/components/saga/Armory';
 import EquipmentPanel from '@/components/character/EquipmentPanel';
+import InventoryPanel from '@/components/dashboard/InventoryPanel';
 import { CharacterCreator } from '@/components/character/CharacterCreator';
 import FellowshipPanel from '@/components/dashboard/FellowshipPanel';
 import { buildMilestoneTracks } from '@/lib/milestones';
@@ -79,6 +80,7 @@ interface DashboardClientProps {
 type Tab =
   | 'overview'
   | 'character'
+  | 'inventory'
   | 'chronicles'
   | 'collection'
   | 'quests'
@@ -266,12 +268,16 @@ export function DashboardClient({ user, canGenerateChapter, hasHeroClass }: Dash
 
           {/* ── Tab: Character ── */}
           {activeTab === 'character' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Opening the armory...</div>}>
-                <EquipmentPanel />
-              </Suspense>
-              <Armory equipment={user.equipment} title="🗡️ All Gear Earned" />
-            </div>
+            <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Opening the armory...</div>}>
+              <EquipmentPanel />
+            </Suspense>
+          )}
+
+          {/* ── Tab: Inventory ── */}
+          {activeTab === 'inventory' && (
+            <Suspense fallback={<div style={{ color: 'var(--color-mist)' }}>Opening your pack...</div>}>
+              <InventoryPanel />
+            </Suspense>
           )}
 
           {/* ── Tab: Fellowship ── */}
