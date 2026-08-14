@@ -1,0 +1,209 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cardLink {
+  text-decoration: none;
+}
+
+.card {
+  position: relative;
+  padding: 2.5rem;
+  border-radius: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Quiz card ── */
+.quizCard {
+  background: linear-gradient(135deg, rgba(13,13,26,0.95), rgba(30,18,60,0.6));
+  border: 1px solid rgba(201,168,76,0.25);
+}
+
+.quizCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201,168,76,0.6);
+  box-shadow: 0 20px 60px rgba(201,168,76,0.12);
+}
+
+/* ── Arena card ── */
+.arenaCard {
+  background: linear-gradient(135deg, rgba(13,13,26,0.95), rgba(60,18,18,0.4));
+  border: 1px solid rgba(124,58,237,0.25);
+}
+
+.arenaCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(124,58,237,0.6);
+  box-shadow: 0 20px 60px rgba(124,58,237,0.12);
+}
+
+/* ── Top bar ── */
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.quizBar {
+  background: linear-gradient(90deg, var(--color-rune-dim), var(--color-rune), var(--color-rune-dim));
+}
+
+.arenaBar {
+  background: linear-gradient(90deg, var(--color-arcane-dim), var(--color-arcane), var(--color-arcane-dim));
+}
+
+/* ── Content ── */
+.cardEmoji {
+  font-size: 3rem;
+  margin-bottom: 1.25rem;
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.quizTitle {
+  color: var(--color-rune);
+}
+
+.arenaTitle {
+  color: var(--color-arcane);
+}
+
+.cardMeta {
+  color: var(--color-shadow);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.cardBody {
+  color: var(--color-mist);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.quizTag {
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.15);
+  color: var(--color-rune-dim);
+}
+
+.arenaTag {
+  background: rgba(124,58,237,0.08);
+  border: 1px solid rgba(124,58,237,0.15);
+  color: var(--color-arcane);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+  width: fit-content;
+}
+
+.cta:hover {
+  opacity: 0.9;
+}
+
+.quizCta {
+  background: linear-gradient(135deg, var(--color-rune), #a07828);
+  color: #000;
+}
+
+.arenaCta {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+}
+
+/* ── Forge banner ── */
+.forgeBanner {
+  padding: 1.5rem 2rem;
+  background: rgba(13,13,26,0.5);
+  border: 1px solid var(--color-dusk);
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: space-between;
+  transition: border-color 0.2s;
+}
+
+.forgeBanner:hover {
+  border-color: rgba(249,115,22,0.3);
+}
+
+.forgeBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.forgeEmoji {
+  font-size: 2rem;
+}
+
+.forgeTitle {
+  font-family: var(--font-heading);
+  color: var(--color-frost);
+  font-size: 1.1rem;
+}
+
+.forgeBody {
+  color: var(--color-mist);
+  font-size: 0.875rem;
+  margin-top: 0.2rem;
+}
+
+.forgeCta {
+  flex-shrink: 0;
+  padding: 0.625rem 1.25rem;
+  background: rgba(234,88,12,0.12);
+  border: 1px solid rgba(234,88,12,0.25);
+  border-radius: 8px;
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.forgeCta:hover {
+  background: rgba(234,88,12,0.2);
+  border-color: rgba(234,88,12,0.5);
+}

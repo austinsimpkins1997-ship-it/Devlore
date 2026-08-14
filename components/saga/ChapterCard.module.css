@@ -1,0 +1,114 @@
+.chapterCard {
+  position: relative;
+  overflow: hidden;
+  padding: calc(var(--space-unit) * 3);
+  display: flex;
+  gap: calc(var(--space-unit) * 3);
+}
+
+.chapterCard::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--color-rune), var(--color-arcane));
+  opacity: 0.5;
+}
+
+.chapterNumber {
+  font-family: var(--font-heading);
+  font-size: 5rem;
+  line-height: 1;
+  color: rgba(201, 168, 76, 0.1);
+  font-weight: 700;
+  user-select: none;
+  position: absolute;
+  top: var(--space-unit);
+  right: calc(var(--space-unit) * 2);
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-unit) * 2);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-unit) * 0.5);
+}
+
+.title {
+  color: var(--color-frost);
+  margin: 0;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.date {
+  color: var(--color-rune);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary {
+  color: var(--color-mist);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 90%;
+}
+
+.stats {
+  display: flex;
+  gap: calc(var(--space-unit) * 3);
+  padding: calc(var(--space-unit) * 1.5);
+  background: rgba(7, 7, 15, 0.5);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-twilight);
+  width: fit-content;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-unit);
+}
+
+.statIcon {
+  font-size: 1.125rem;
+}
+
+.statText {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-frost);
+}
+
+.actions {
+  margin-top: var(--space-unit);
+}
+
+/* Locked State */
+.locked {
+  opacity: 0.7;
+}
+
+.locked::before {
+  background: var(--color-shadow);
+}
+
+.locked .title {
+  color: var(--color-shadow);
+}
+
+.locked .date {
+  color: var(--color-shadow);
+}

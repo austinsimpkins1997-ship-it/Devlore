@@ -1,0 +1,223 @@
+.quizPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+  background-color: var(--color-void);
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.questionCard {
+  width: 100%;
+  max-width: 700px;
+  animation: fadeIn 0.4s ease-out;
+  position: relative;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 12px;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.progressTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--color-dusk);
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--color-rune);
+  transition: width 0.3s ease;
+}
+
+.questionHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.questionNumber {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  background: var(--color-rune-dim);
+  color: var(--color-rune);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.questionText {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  color: white;
+  line-height: 1.3;
+}
+
+.answerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 680px) {
+  .answerGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.answerCard {
+  background: rgba(13, 13, 26, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-dusk);
+  border-radius: 8px;
+  padding: 1.5rem;
+  color: var(--color-mist);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+.answerCard:hover {
+  border-color: var(--color-rune);
+  box-shadow: 0 0 15px var(--color-rune-glow);
+  color: white;
+}
+
+.answerCard.selected {
+  border-color: var(--color-rune);
+  background: rgba(245, 158, 11, 0.1);
+  color: white;
+}
+
+.resultCard {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  animation: slideUp 0.6s ease-out;
+  background: var(--color-abyss);
+  border: 1px solid var(--color-dusk);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+}
+
+.resultEmoji {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.heroName {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  background: linear-gradient(to right, var(--color-rune), var(--color-arcane));
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.heroTitle {
+  color: var(--color-mist);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.heroDesc {
+  color: var(--color-mist);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.traitsList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.traitBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--color-dusk);
+  color: white;
+}
+
+.ctaRow {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.shareBtn, .tryAgainBtn, .confirmBtn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.shareBtn {
+  background: transparent;
+  border: 1px solid var(--color-rune);
+  color: var(--color-rune);
+}
+
+.shareBtn:hover {
+  background: var(--color-rune-dim);
+}
+
+.confirmBtn {
+  background: var(--color-rune);
+  border: 1px solid var(--color-rune);
+  color: var(--color-void);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmBtn:hover {
+  box-shadow: 0 0 15px var(--color-rune-glow);
+}
+
+.tryAgainBtn {
+  background: transparent;
+  border: 1px solid var(--color-dusk);
+  color: var(--color-mist);
+}
+
+.tryAgainBtn:hover {
+  border-color: white;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

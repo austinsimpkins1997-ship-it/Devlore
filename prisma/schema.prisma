@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth.js v5 Required Models ────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── Core Application Models ────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  // GitHub identity
+  githubId     String?  @unique
+  username     String?  @unique
+  displayName  String  @default("")
+  avatarUrl    String?
+  bio          String?
+
+  // Hero identity
+  heroClass     String? // e.g. "Arcane Architect"
+  heroTitle     String? // e.g. "Master of TypeScript Sorcery"
+  heroClassSlug String? // e.g. "arcane-architect"
+  originStory   String? @db.Text
+  level         Int     @default(1)
+  xp            Int     @default(0)
+
+  // GitHub stats cache
+  totalCommits         Int      @default(0)
+  currentStreak        Int      @default(0)
+  longestStreak        Int      @default(0)
+  topLanguages         Json?    // { "TypeScript": 45, "Python": 30 }
+  languageCount        Int      @default(0)
+  firstCommitDate      DateTime?
+  nightCommitRatio     Float    @default(0)
+  docCommitRatio       Float    @default(0)
+  avgRepoSize          Float    @default(0)
+  hasInfraRepos        Boolean  @default(false)
+  openSourceContribCount Int    @default(0)
+
+  // Subscription
+  tier             Tier    @default(FREE)
+  stripeCustomerId String? @unique
+  stripeSubId      String? @unique
+  stripePriceId    String?
+  trialEndsAt      DateTime?
+  subCurrentPeriodEnd DateTime?
+
+  // GitHub App installation (for private repos)
+  ghInstallationId Int?
+
+  // Settings
+  isPublic         Boolean @default(true)
+  emailChronicle   Boolean @default(true)
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastAnalyzedAt DateTime?
+
+  // Relations
+  accounts  Account[]
+  sessions  Session[]
+  chapters  Chapter[]
+  loreCards LoreCard[]
+  analyses  Analysis[]
+
+  @@index([username])
+  @@index([tier])
+}
+
+model Chapter {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  number  Int    // Chapter 1, 2, 3...
+  title   String // "The Week the Dragon Was Slain"
+  content String @db.Text
+  summary String // 1-sentence hook
+
+  weekStart DateTime
+  weekEnd   DateTime
+
+  // Raw stats
+  commitCount Int      @default(0)
+  prsMerged   Int      @default(0)
+  bugsFixed   Int      @default(0)
+  languages   Json?    // languages used this week
+  newRepos    String[]
+
+  xpEarned Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, number])
+  @@index([userId, weekStart])
+}
+
+model LoreCard {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cardType   CardType
+  rarity     Rarity   @default(COMMON)
+  name       String   // "Dragon Slayer"
+  flavorText String   // Short narrative description
+  milestone  String   // "100 commits reached"
+  xpValue    Int      @default(0)
+
+  unlockedAt DateTime @default(now())
+
+  @@index([userId, rarity])
+}
+
+model Analysis {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status       AnalysisStatus @default(PENDING)
+  triggeredBy  String         // "first_login" | "webhook_push" | "manual" | "weekly_cron"
+  inngestRunId String?
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  error       String?
+
+  @@index([userId, status])
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+enum Tier {
+  FREE
+  PRO
+  LEGEND
+}
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum CardType {
+  ACHIEVEMENT
+  STREAK
+  LANGUAGE
+  PROJECT
+  COLLABORATION
+  CLASS_EVOLUTION
+}
+
+enum AnalysisStatus {
+  PENDING
+  RUNNING
+  COMPLETE
+  FAILED
+}

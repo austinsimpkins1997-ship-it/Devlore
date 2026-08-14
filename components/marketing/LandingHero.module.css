@@ -1,0 +1,205 @@
+.heroSection {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 68px; /* fixed navbar height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-void);
+}
+
+.background {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.grid {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(124, 58, 237, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
+  transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+  animation: gridMove 20s linear infinite;
+}
+
+.runes {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.rune {
+  position: absolute;
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--color-twilight);
+  opacity: 0.3;
+  animation: float 6s ease-in-out infinite;
+  text-shadow: 0 0 20px var(--color-rune);
+}
+
+.particles {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--color-rune-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-rune);
+  animation: floatUp 10s linear infinite;
+}
+
+.particle:nth-child(1) { left: 20%; top: 80%; animation-duration: 8s; }
+.particle:nth-child(2) { left: 50%; top: 90%; animation-duration: 12s; }
+.particle:nth-child(3) { left: 80%; top: 75%; animation-duration: 9s; }
+.particle:nth-child(4) { left: 35%; top: 85%; animation-duration: 11s; }
+.particle:nth-child(5) { left: 65%; top: 95%; animation-duration: 10s; }
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  padding: calc(var(--space-unit) * 4);
+}
+
+.title {
+  font-size: 4rem;
+  margin-bottom: calc(var(--space-unit) * 3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-unit);
+}
+
+.titlePart:first-child {
+  color: var(--color-frost);
+}
+
+.titlePart:last-child {
+  color: var(--color-rune-glow);
+  text-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
+  animation: reveal 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  animation-delay: 0.5s;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--color-mist);
+  margin-bottom: calc(var(--space-unit) * 4);
+  max-width: 600px;
+  line-height: 1.8;
+  opacity: 0;
+  animation: fade-in-up 1s ease forwards;
+  animation-delay: 1.5s;
+}
+
+.actions {
+  display: flex;
+  gap: calc(var(--space-unit) * 2);
+  margin-bottom: calc(var(--space-unit) * 8);
+  opacity: 0;
+  animation: fade-in-up 1s ease forwards;
+  animation-delay: 2s;
+}
+
+.archetypesCarousel {
+  display: flex;
+  gap: calc(var(--space-unit) * 3);
+  opacity: 0;
+  animation: fade-in-up 1s ease forwards;
+  animation-delay: 2.5s;
+}
+
+.archetypeCard {
+  background: rgba(13, 13, 26, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-twilight);
+  padding: calc(var(--space-unit) * 2) calc(var(--space-unit) * 3);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-unit);
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.archetypeCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-rune);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.archIcon {
+  font-size: 2rem;
+}
+
+.archName {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  color: var(--color-frost);
+}
+
+.scrollIndicator {
+  position: absolute;
+  bottom: calc(var(--space-unit) * 4);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  opacity: 0;
+  animation: bounce 2s infinite, fade-in-up 1s forwards 3s;
+}
+
+.chevron {
+  font-size: 2rem;
+  color: var(--color-mist);
+}
+
+@keyframes gridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 50px; }
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.8; }
+  100% { transform: translateY(-500px) scale(0); opacity: 0; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 3rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .archetypesCarousel {
+    flex-direction: column;
+  }
+}

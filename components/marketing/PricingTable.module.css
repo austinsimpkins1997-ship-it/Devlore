@@ -1,0 +1,234 @@
+.pricingSection {
+  padding: calc(var(--space-unit) * 12) calc(var(--space-unit) * 2);
+  background: var(--color-void);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: calc(var(--space-unit) * 8);
+}
+
+.title {
+  font-size: 3rem;
+  color: var(--color-frost);
+  margin-bottom: var(--space-unit);
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--color-mist);
+  margin-bottom: calc(var(--space-unit) * 4);
+}
+
+.toggleWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 2);
+  background: var(--color-abyss);
+  padding: calc(var(--space-unit) * 1.5) calc(var(--space-unit) * 3);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-twilight);
+}
+
+.toggleLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-shadow);
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: var(--space-unit);
+}
+
+.toggleLabel.active {
+  color: var(--color-frost);
+}
+
+.discountBadge {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--color-success);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.toggleBtn {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background: var(--color-twilight);
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--color-rune);
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.knobAnnual {
+  transform: translateX(24px);
+}
+
+.grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--space-unit) * 3);
+  align-items: center;
+}
+
+.card {
+  background: var(--color-abyss);
+  border: 1px solid var(--color-twilight);
+  border-radius: var(--radius-lg);
+  padding: calc(var(--space-unit) * 4);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.proCard {
+  border-color: var(--color-arcane);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.1);
+  transform: scale(1.05);
+  z-index: 1;
+}
+
+.proCard:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.2);
+}
+
+.popularBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--color-arcane), var(--color-arcane-glow));
+  color: white;
+  padding: 4px 16px;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+}
+
+.cardHeader {
+  margin-bottom: calc(var(--space-unit) * 4);
+  text-align: center;
+}
+
+.tierName {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--color-frost);
+  margin-bottom: var(--space-unit);
+}
+
+.priceBlock {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: var(--space-unit);
+}
+
+.currency {
+  font-size: 1.5rem;
+  color: var(--color-mist);
+  margin-right: 4px;
+}
+
+.price {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--color-rune-glow);
+  line-height: 1;
+}
+
+.period {
+  color: var(--color-shadow);
+  margin-left: 4px;
+}
+
+.tierDesc {
+  color: var(--color-mist);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 calc(var(--space-unit) * 4) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-unit);
+  flex-grow: 1;
+}
+
+.featureList li {
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-unit);
+}
+
+.included {
+  color: var(--color-frost);
+}
+
+.included::before {
+  content: '✓';
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+.excluded {
+  color: var(--color-shadow);
+  text-decoration: line-through;
+}
+
+.excluded::before {
+  content: '✕';
+  color: var(--color-shadow);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cta {
+  width: 100%;
+  margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: calc(var(--space-unit) * 6);
+  }
+  
+  .proCard {
+    transform: none;
+  }
+  
+  .proCard:hover {
+    transform: translateY(-5px);
+  }
+}

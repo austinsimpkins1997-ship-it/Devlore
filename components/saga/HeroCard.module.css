@@ -1,0 +1,204 @@
+.heroCard {
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+  position: relative;
+  padding: calc(var(--space-unit) * 3);
+}
+
+.runesBackground {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  z-index: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.rune1, .rune2, .rune3 {
+  position: absolute;
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--color-rune);
+  animation: float 6s ease-in-out infinite;
+}
+
+.rune1 { top: 10%; left: 10%; animation-delay: 0s; }
+.rune2 { top: 50%; right: 10%; font-size: 3rem; animation-delay: 2s; }
+.rune3 { bottom: 10%; left: 30%; font-size: 5rem; animation-delay: 4s; }
+
+.tierBadge {
+  position: absolute;
+  top: calc(var(--space-unit) * 2);
+  right: calc(var(--space-unit) * 2);
+  z-index: 2;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--space-unit) * 2);
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.avatar, .avatarPlaceholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--color-rune);
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  background: var(--color-abyss);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  color: var(--color-rune);
+}
+
+.levelBadge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-unit) * 0.5);
+}
+
+.className {
+  color: var(--color-rune-glow);
+  font-size: 1.5rem;
+  margin: 0;
+  text-shadow: 0 0 15px rgba(201, 168, 76, 0.5);
+}
+
+.heroTitle {
+  color: var(--color-mist);
+  font-style: italic;
+  margin: 0;
+}
+
+.nameBlock {
+  margin-top: calc(var(--space-unit) * 1);
+}
+
+.displayName {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.username {
+  color: var(--color-shadow);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.xpSection {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(var(--space-unit) * 3);
+  margin-bottom: calc(var(--space-unit) * 3);
+}
+
+.xpHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-unit);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+.xpLabel {
+  color: var(--color-mist);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.xpValue {
+  color: var(--color-rune);
+  font-weight: 600;
+}
+
+.xpBarContainer {
+  height: 8px;
+  background: var(--color-twilight);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.xpBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-rune-dim), var(--color-rune-glow));
+  border-radius: 4px;
+  transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.5);
+}
+
+.statsRow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-unit);
+  border-top: 1px solid var(--color-twilight);
+  padding-top: calc(var(--space-unit) * 2);
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(18, 18, 42, 0.5);
+  padding: var(--space-unit);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.statBox:hover {
+  border-color: var(--color-twilight);
+  background: rgba(30, 30, 63, 0.5);
+}
+
+.statIcon {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--color-frost);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--color-shadow);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Hero Class specific theming via CSS variables overridden by class */
+.arcane-architect {
+  --color-rune: var(--color-arcane);
+  --color-rune-glow: var(--color-arcane-glow);
+  --color-rune-dim: var(--color-arcane-dim);
+}

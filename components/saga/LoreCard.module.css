@@ -1,0 +1,205 @@
+.cardContainer {
+  width: 160px;
+  height: 220px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.isNew {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+
+.cardFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-abyss);
+  border: 2px solid;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardFront {
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-unit);
+  background-image: radial-gradient(circle at center, rgba(30,30,63,0.5) 0%, var(--color-abyss) 100%);
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+  background: var(--color-void);
+  padding: calc(var(--space-unit) * 1.5);
+}
+
+/* Rarity Styles */
+.common { border-color: var(--rarity-common); }
+.uncommon { border-color: var(--rarity-uncommon); box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); }
+.rare { border-color: var(--rarity-rare); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+.epic { border-color: var(--rarity-epic); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+.legendary { 
+  border-color: var(--rarity-legendary); 
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+}
+
+.legendary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(245, 158, 11, 0.2) 50%, transparent 100%);
+  background-size: 200% 200%;
+  animation: shimmer 2s infinite linear;
+  pointer-events: none;
+}
+
+.newBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--color-danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 10px var(--color-danger);
+  animation: pulse-glow 1.5s infinite;
+  z-index: 10;
+}
+
+.typeIcon {
+  position: absolute;
+  top: var(--space-unit);
+  left: var(--space-unit);
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+.runeSymbol {
+  font-family: var(--font-heading);
+  font-size: 4.5rem;
+  color: var(--color-twilight);
+  margin-top: auto;
+  margin-bottom: auto;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.legendary .runeSymbol {
+  color: var(--rarity-legendary);
+}
+
+.epic .runeSymbol {
+  color: var(--rarity-epic);
+}
+
+.cardHeader {
+  width: 100%;
+  text-align: center;
+  background: rgba(7, 7, 15, 0.8);
+  padding: var(--space-unit);
+  border-radius: 0 0 calc(var(--radius-md) - 2px) calc(var(--radius-md) - 2px);
+  margin: calc(var(--space-unit) * -1); /* counter padding */
+  margin-top: auto;
+  border-top: 1px solid var(--color-twilight);
+}
+
+.cardName {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  color: var(--color-frost);
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rarityLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: inherit; /* will inherit from rarity block if we set it, or just use mist */
+  opacity: 0.8;
+}
+
+/* Back Content */
+.backContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  text-align: center;
+}
+
+.typeIconSmall {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.cardNameSmall {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  color: var(--color-rune);
+  margin: 0 0 var(--space-unit) 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-twilight);
+  width: 100%;
+}
+
+.flavorText {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--color-mist);
+  margin: 0 0 auto 0;
+  line-height: 1.4;
+}
+
+.milestoneBlock {
+  margin-top: var(--space-unit);
+  margin-bottom: var(--space-unit);
+  background: var(--color-abyss);
+  width: 100%;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-twilight);
+}
+
+.milestoneLabel {
+  display: block;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  color: var(--color-shadow);
+  margin-bottom: 2px;
+}
+
+.milestoneText {
+  display: block;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--color-frost);
+}
+
+.xpBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-rune-glow);
+  background: rgba(201, 168, 76, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}

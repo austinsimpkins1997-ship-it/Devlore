@@ -1,0 +1,51 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-body);
+}
+
+.tier {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-rune-glow);
+  border: 1px solid var(--color-rune-dim);
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.2);
+}
+
+.class {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--color-arcane-glow);
+  border: 1px solid var(--color-arcane-dim);
+}
+
+.level {
+  background: var(--color-dusk);
+  color: var(--color-frost);
+  border: 1px solid var(--color-twilight);
+  font-family: var(--font-mono);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.rarity {
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.common { color: var(--rarity-common); }
+.uncommon { color: var(--rarity-uncommon); }
+.rare { color: var(--rarity-rare); }
+.epic { color: var(--rarity-epic); box-shadow: 0 0 8px var(--rarity-epic); }
+.legendary { 
+  color: var(--rarity-legendary); 
+  box-shadow: 0 0 10px var(--rarity-legendary);
+  animation: pulse-glow 2s infinite;
+}
