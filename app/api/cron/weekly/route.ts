@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { inngest } from '@/lib/inngest/client';
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
- * Weekly chapter generation cron — runs every Monday at 06:00 UTC
- * Configured in vercel.json: { "crons": [{ "path": "/api/cron/weekly", "schedule": "0 6 * * 1" }] }
+ * Weekly chapter generation cron — runs every Monday at 09:00 UTC
+ * Configured in vercel.json: { "crons": [{ "path": "/api/cron/weekly", "schedule": "0 9 * * 1" }] }
  *
  * Security: Vercel sets Authorization: Bearer <CRON_SECRET> automatically
  */

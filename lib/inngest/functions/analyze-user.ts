@@ -23,7 +23,7 @@ export const analyzeUser = inngest.createFunction(
       await prisma.analysis.create({
         data: {
           userId,
-          status: 'RUNNING',
+          status: 'RUNNING' as const,
           triggeredBy: triggeredBy ?? 'unknown',
         },
       });

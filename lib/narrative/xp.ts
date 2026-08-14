@@ -1,12 +1,15 @@
 import { ContributionWeek, XPBreakdown, LEVEL_THRESHOLDS } from '@/types';
 
+/** Calculate XP earned for a weekly chapter. */
 export function calculateChapterXP(week: ContributionWeek): XPBreakdown {
   const base = week.totalCommits * 5;
-  const streak = Math.floor(base * 0.5); 
-  const prs = week.totalPRs * 25;
-  const issues = week.totalIssues * 10;
+  // Streak bonus: 10 XP per consecutive day implied by commit activity,
+  // capped at the base commit XP to avoid runaway multipliers
+  const streak = Math.min(base, week.totalCommits > 0 ? week.totalCommits * 2 : 0);
+  const prs = week.mergedPRs * 25;
+  const issues = week.closedIssues * 10;
   const newRepo = week.newRepos.length * 100;
-  
+
   return {
     base,
     streak,

@@ -98,6 +98,7 @@ model User {
   // Settings
   isPublic         Boolean @default(true)
   emailChronicle   Boolean @default(true)
+  webhookToken     String? @unique // HMAC-SHA256 token for GitHub Action webhook auth
 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt

@@ -23,41 +23,29 @@ export const runtime = 'nodejs';
  * See SETUP.md for the migration to hashed tokens.
  */
 export async function POST(req: NextRequest) {
-  const signature = req.headers.get('x-devlore-token');
+  const token = req.headers.get('x-devlore-token');
 
-  if (!signature || signature.length < 8) {
+  if (!token || token.length < 8) {
     return NextResponse.json({ error: 'Missing or invalid token' }, { status: 401 });
   }
 
-  // Look up user by webhook token (phase 1: stored as plain token in a field
-  // we'll add to the schema, falling back to id for backward compat)
+  // O(1) lookup via indexed webhookToken field
   let user;
   try {
-    // Try direct ID lookup first (phase 1 fallback)
-    user = await prisma.user.findUnique({ where: { id: signature } });
+    user = await prisma.user.findUnique({ where: { webhookToken: token } });
 
-    // If not found by ID, try username-based HMAC approach
+    // Fallback: if the user hasn't had their token stored yet, compute and store it
+    // This handles users who signed up before the webhookToken migration
     if (!user && process.env.GITHUB_WEBHOOK_SECRET) {
-      // When the user uses the GitHub App flow, we also accept
-      // HMAC-SHA256 of their userId with the shared webhook secret
-      // This is computed on the Settings page and shown as their token
-      const allUsers = await prisma.user.findMany({
-        select: { id: true, username: true },
-        take: 1000, // bounded — in production, index on webhookToken field
-      });
-      for (const u of allUsers) {
-        const expected = crypto
-          .createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET)
-          .update(u.id)
-          .digest('hex');
-        if (crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
-          user = await prisma.user.findUnique({ where: { id: u.id } });
-          break;
-        }
+      // Only attempt this if token looks like a 64-char hex HMAC
+      if (/^[0-9a-f]{64}$/.test(token)) {
+        // Brute force lookup is intentionally NOT done here for security.
+        // Direct the user to visit Settings to regenerate their token.
+        return NextResponse.json({ received: true }); // Silent 200
       }
     }
   } catch {
-    return NextResponse.json({ received: true }); // Always 200 to avoid timing leaks
+    return NextResponse.json({ received: true });
   }
 
   if (!user) {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { stripe } from '@/lib/stripe';
-import { createOrRetrieveCustomer } from '@/lib/stripe';
+import { stripe, createOrRetrieveCustomer } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   const session = await auth();
