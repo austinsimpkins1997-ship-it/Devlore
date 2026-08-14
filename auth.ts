@@ -5,13 +5,16 @@ import { prisma } from '@/lib/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  trustHost: true,
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID!,
       clientSecret: process.env.AUTH_GITHUB_SECRET!,
+      // Disable PKCE — cookie is lost in Vercel serverless between sign-in
+      // and callback. State-only is safe: client_secret is server-side.
+      checks: ['state'],
       authorization: {
         params: {
-          // Public repo read + user profile; private repo requires App install
           scope: 'read:user user:email public_repo read:org',
         },
       },
